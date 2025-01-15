@@ -13,5 +13,7 @@
             "email": "coding@nebalus.dev"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=8.3"
+    }
 }
