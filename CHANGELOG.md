@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added PHP version requirements to composer.json
 
+[1.0.0]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.1
+
+
 ## [1.0.0] - 2025-01-15
 ### Added 
 - Added base structures
