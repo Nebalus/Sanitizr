@@ -1,0 +1,20 @@
+name: Update Packagist
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers when a tag matching the pattern is pushed.
+
+jobs:
+  update-packagist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Notify Packagist
+        run: |
+          curl -X POST -d "username=${{ secrets.PACKAGIST_USERNAME }}" \
+                       -d "apiToken=${{ secrets.PACKAGIST_API_TOKEN }}" \
+                       https://packagist.org/api/update-package?package=nebalus/sanitizr
