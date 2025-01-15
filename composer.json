@@ -1,0 +1,17 @@
+{
+    "name": "nebalus/sanitizr",
+    "type": "libary",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nebalus\\Sanitizr\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nebalus",
+            "email": "coding@nebalus.dev"
+        }
+    ],
+    "require": {}
+}
