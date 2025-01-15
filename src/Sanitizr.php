@@ -5,6 +5,8 @@ namespace Nebalus\Sanitizr;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Schema\SanitizrArraySchema;
 use Nebalus\Sanitizr\Schema\SanitizrBooleanSchema;
+use Nebalus\Sanitizr\Schema\SanitizrDateSchema;
+use Nebalus\Sanitizr\Schema\SanitizrFileSchema;
 use Nebalus\Sanitizr\Schema\SanitizrNullSchema;
 use Nebalus\Sanitizr\Schema\SanitizrNumberSchema;
 use Nebalus\Sanitizr\Schema\SanitizrObjectSchema;
@@ -12,6 +14,16 @@ use Nebalus\Sanitizr\Schema\SanitizrStringSchema;
 
 class Sanitizr
 {
+    public static function date(): SanitizrDateSchema
+    {
+        return new SanitizrDateSchema();
+    }
+
+    public static function file(): SanitizrFileSchema
+    {
+        return new SanitizrFileSchema();
+    }
+
     public static function boolean(): SanitizrBooleanSchema
     {
         return new SanitizrBooleanSchema();
@@ -32,9 +44,9 @@ class Sanitizr
         return new SanitizrArraySchema($schema);
     }
 
-    public static function object(array $schemas): SanitizrObjectSchema
+    public static function object(array $schema): SanitizrObjectSchema
     {
-        return new SanitizrObjectSchema($schemas);
+        return new SanitizrObjectSchema($schema);
     }
 
     public static function null(): SanitizrNullSchema

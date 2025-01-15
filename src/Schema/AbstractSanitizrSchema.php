@@ -7,14 +7,15 @@ use Nebalus\Sanitizr\Value\SafeParsedData;
 
 abstract class AbstractSanitizrSchema
 {
-    private array $effectQueue = [];
+    private array $checkQueue = [];
+
     private bool $isRequired = false;
     private bool $isNullable = false;
     private mixed $defaultValue;
 
-    protected function addEffect(callable $callable): void
+    protected function addCheck(callable $callable): void
     {
-        $this->effectQueue[] = [$callable];
+        $this->checkQueue[] = [$callable];
     }
 
     public function required(): static
@@ -55,8 +56,8 @@ abstract class AbstractSanitizrSchema
 
         $parsedValue = $this->parseValue($input);
 
-        foreach ($this->effectQueue as $effect) {
-            $effect[0]($parsedValue);
+        foreach ($this->checkQueue as $check) {
+            $check[0]($parsedValue);
         }
 
         return $parsedValue;

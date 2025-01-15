@@ -8,7 +8,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 {
     public function length(int $length, string $message = 'Must be exact %s characters long'): static
     {
-        $this->addEffect(function (string $input) use ($length, $message) {
+        $this->addCheck(function (string $input) use ($length, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength !== $length) {
@@ -21,7 +21,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function min(int $min, string $message = 'Must be %s or more characters long'): static
     {
-        $this->addEffect(function (string $input) use ($min, $message) {
+        $this->addCheck(function (string $input) use ($min, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength < $min) {
@@ -34,7 +34,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function max(int $max, string $message = 'Must be %s or fewer characters long'): static
     {
-        $this->addEffect(function (string $input) use ($max, $message) {
+        $this->addCheck(function (string $input) use ($max, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength > $max) {
@@ -45,9 +45,23 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function between(int $min, int $max, string $message = 'Must be between %s and %s'): static
+    {
+        $this->addCheck(function (string $input) use ($min, $max, $message) {
+            $inputLength = strlen($input);
+
+            if ($inputLength < $min || $inputLength > $max) {
+                throw new SanitizrValidationException(sprintf($message, $min, $max));
+            }
+        });
+
+        return $this;
+    }
+
+
     public function regex(string $pattern, string $message = 'Does not match the pattern'): static
     {
-        $this->addEffect(function (string $input) use ($pattern, $message) {
+        $this->addCheck(function (string $input) use ($pattern, $message) {
             if (! preg_match($pattern, $input)) {
                 throw new SanitizrValidationException($message);
             }
@@ -58,7 +72,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function email(string $message = 'Not a valid email address'): static
     {
-        $this->addEffect(function (string $input) use ($message) {
+        $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_EMAIL)) {
                 throw new SanitizrValidationException($message);
             }
@@ -69,7 +83,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function url(string $message = 'Not a valid URL'): static
     {
-        $this->addEffect(function (string $input) use ($message) {
+        $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
                 throw new SanitizrValidationException($message);
             }
@@ -80,7 +94,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function startsWith(string $prefix, string $message = 'Does not start with required string'): static
     {
-        $this->addEffect(function (string $input) use ($prefix, $message) {
+        $this->addCheck(function (string $input) use ($prefix, $message) {
             if (str_starts_with($input, $prefix) === false) {
                 throw new SanitizrValidationException(sprintf($message, $prefix));
             }
@@ -91,7 +105,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
 
     public function endsWith(string $suffix, string $message = 'Does not end with required string'): static
     {
-        $this->addEffect(function (string $input) use ($suffix, $message) {
+        $this->addCheck(function (string $input) use ($suffix, $message) {
             if (str_ends_with($input, $suffix) === false) {
                 throw new SanitizrValidationException(sprintf($message, $suffix));
             }
@@ -105,8 +119,6 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input): string
     {
-
-
         if (! is_string($input)) {
             throw new SanitizrValidationException('Not a string value');
         }

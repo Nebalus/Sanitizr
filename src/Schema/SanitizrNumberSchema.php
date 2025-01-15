@@ -9,7 +9,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 {
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
-        $this->addEffect(function (int|float $input) use ($value, $message) {
+        $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input < $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
@@ -20,7 +20,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function gte(int|float $value, string $message = 'Must be greater than or equal to %s'): static
     {
-        $this->addEffect(function (int|float $input) use ($value, $message) {
+        $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input <= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
@@ -31,7 +31,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function lt(int|float $value, string $message = 'Must be less than %s'): static
     {
-        $this->addEffect(function (int|float $input) use ($value, $message) {
+        $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input > $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
@@ -42,7 +42,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function lte(int|float $value, string $message = 'Must be less than or equal to %s'): static
     {
-        $this->addEffect(function (int|float $input) use ($value, $message) {
+        $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input >= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
@@ -53,7 +53,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function float(string $message = 'Must be an float number'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if (! is_float($input)) {
                 throw new SanitizrValidationException($message);
             }
@@ -64,7 +64,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function integer(string $message = 'Must be an integer number'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if (! is_int($input)) {
                 throw new SanitizrValidationException($message);
             }
@@ -75,7 +75,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function positive(string $message = 'Must be a positive number'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if ($input <= 0) {
                 throw new SanitizrValidationException($message);
             }
@@ -84,9 +84,9 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function nonpositive(string $message = 'Must be a negative number or 0'): static
+    public function nonPositive(string $message = 'Must be a negative number or 0'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if ($input > 0) {
                 throw new SanitizrValidationException($message);
             }
@@ -97,7 +97,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function negative(string $message = 'Must be a negative number'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if ($input >= 0) {
                 throw new SanitizrValidationException($message);
             }
@@ -106,9 +106,9 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function nonnegative(string $message = 'Must be a positive number or 0'): static
+    public function nonNegative(string $message = 'Must be a positive number or 0'): static
     {
-        $this->addEffect(function (int|float $input) use ($message) {
+        $this->addCheck(function (int|float $input) use ($message) {
             if ($input < 0) {
                 throw new SanitizrValidationException($message);
             }
@@ -119,7 +119,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
     public function multipleOf(int $multiple, string $message = 'Must be a multiple of %s'): static
     {
-        $this->addEffect(function (int $input) use ($multiple, $message) {
+        $this->addCheck(function (int $input) use ($multiple, $message) {
             if ($input % $multiple !== 0) {
                 throw new SanitizrValidationException(sprintf($message, $multiple));
             }

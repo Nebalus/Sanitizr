@@ -9,7 +9,7 @@ class SanitizrNullSchema extends AbstractSanitizrSchema
     protected function parseValue(mixed $input): null
     {
         if (! is_null($input)) {
-            throw new SanitizrValidationException('Not a null value');
+            throw new SanitizrValidationException('Value must be null');
         }
 
         return null;
