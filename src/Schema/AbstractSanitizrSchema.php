@@ -9,7 +9,7 @@ abstract class AbstractSanitizrSchema
 {
     private array $checkQueue = [];
 
-    private bool $isRequired = false;
+    private bool $isOptional = false;
     private bool $isNullable = false;
     private mixed $defaultValue;
 
@@ -18,9 +18,9 @@ abstract class AbstractSanitizrSchema
         $this->checkQueue[] = [$callable];
     }
 
-    public function required(): static
+    public function optional(): static
     {
-        $this->isRequired = true;
+        $this->isOptional = true;
         return $this;
     }
 
@@ -36,9 +36,9 @@ abstract class AbstractSanitizrSchema
         return $this;
     }
 
-    public function isRequired(): bool
+    public function isOptional(): bool
     {
-        return $this->isRequired;
+        return $this->isOptional;
     }
 
     /**

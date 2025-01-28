@@ -6,7 +6,6 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 class AbstractValueSanitizrSchema extends AbstractSanitizrSchema
 {
-
     /**
      * @inheritDoc
      */
