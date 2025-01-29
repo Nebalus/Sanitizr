@@ -28,7 +28,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
 
         foreach ($this->schemas as $prop => $schema) {
             if ($schema instanceof AbstractSanitizrSchema) {
-                if ($schema->isOptional() && isset($input[$prop]) === false) {
+                if ($schema->isOptional() === false && isset($input[$prop]) === false) {
                     throw new SanitizrValidationException($prop . " is required");
                 }
 
