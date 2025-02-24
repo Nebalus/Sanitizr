@@ -14,14 +14,14 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input): array
+    protected function parseValue(mixed $input, string $message = 'Value must be an OBJECT', string $path = ''): array
     {
         if (is_object($input)) {
             $input = get_object_vars($input);
         }
 
         if (!is_array($input)) {
-            throw new SanitizrValidationException('Not an object');
+            throw new SanitizrValidationException($message);
         }
 
         $result = [];
@@ -29,7 +29,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
         foreach ($this->schemas as $prop => $schema) {
             if ($schema instanceof AbstractSanitizrSchema) {
                 if ($schema->isOptional() === false && isset($input[$prop]) === false) {
-                    throw new SanitizrValidationException($prop . " is required");
+                    throw new SanitizrValidationException($path . "." . $prop . " is required");
                 }
 
                 if ($schema instanceof SanitizrObjectSchema) {

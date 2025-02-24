@@ -2,9 +2,14 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Exception\SanitizrValidationException;
+
 class SanitizrDateSchema extends AbstractSanitizrSchema
 {
-    protected function parseValue(mixed $input): mixed
+    /**
+     * @throws SanitizrValidationException
+     */
+    protected function parseValue(mixed $input, string $message = 'Value must be an DATE', string $path = ''): mixed
     {
         // TODO: Implement parseValue() method.
     }

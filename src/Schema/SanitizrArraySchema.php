@@ -11,10 +11,13 @@ class SanitizrArraySchema extends AbstractSanitizrSchema
     ) {
     }
 
-    protected function parseValue(mixed $input): array
+    /**
+     * @throws SanitizrValidationException
+     */
+    protected function parseValue(mixed $input, string $message = 'Value must be an ARRAY', string $path = ''): array
     {
         if (! is_array($input)) {
-            throw new SanitizrValidationException('Not an array');
+            throw new SanitizrValidationException($message);
         }
 
         $result = [];

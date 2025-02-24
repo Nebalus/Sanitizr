@@ -6,10 +6,13 @@ use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrNullSchema extends AbstractSanitizrSchema
 {
-    protected function parseValue(mixed $input): null
+    /**
+     * @throws SanitizrValidationException
+     */
+    protected function parseValue(mixed $input, string $message = 'Value must be NULL', string $path = ''): null
     {
         if (! is_null($input)) {
-            throw new SanitizrValidationException('Value must be null');
+            throw new SanitizrValidationException($message);
         }
 
         return null;

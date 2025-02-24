@@ -1,0 +1,8 @@
+name: "sanitizr-phpunit"
+services:
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/php-fpm/Dockerfile
+      target: unittest

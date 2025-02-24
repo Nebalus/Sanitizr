@@ -36,6 +36,10 @@ abstract class AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Is only used, if this schema is in an object schema
+     * @return bool
+     */
     public function isOptional(): bool
     {
         return $this->isOptional;
@@ -76,5 +80,5 @@ abstract class AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    abstract protected function parseValue(mixed $input): mixed;
+    abstract protected function parseValue(mixed $input, string $message, string $path = ''): mixed;
 }
