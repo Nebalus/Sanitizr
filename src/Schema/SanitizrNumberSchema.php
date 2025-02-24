@@ -131,10 +131,10 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = 'Value must be NUMERIC', string $path = ''): int
+    protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
     {
         if (! is_numeric($input)) {
-            throw new SanitizrValidationException($message);
+            throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
         }
 
         return $input;

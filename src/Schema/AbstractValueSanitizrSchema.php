@@ -9,7 +9,7 @@ class AbstractValueSanitizrSchema extends AbstractSanitizrSchema
     /**
      * @inheritDoc
      */
-    protected function parseValue(mixed $input): mixed
+    protected function parseValue(mixed $input, string $message, string $path = ''): mixed
     {
         // TODO: Implement parseValue() method.
     }
