@@ -42,7 +42,8 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                 }
 
                 $result[$prop] = $schema->parse(
-                    $input[$prop] ?? null
+                    $input[$prop] ?? null,
+                    path: $updatedPath
                 );
             }
         }

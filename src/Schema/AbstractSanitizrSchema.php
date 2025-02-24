@@ -48,7 +48,7 @@ abstract class AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    public function parse(mixed $input): mixed
+    public function parse(mixed $input, string $path = ''): mixed
     {
         if ($this->isNullable && is_null($input)) {
             return null;
@@ -58,7 +58,7 @@ abstract class AbstractSanitizrSchema
             return $this->defaultValue;
         }
 
-        $parsedValue = $this->parseValue($input);
+        $parsedValue = $this->parseValue($input, path: $path);
 
         foreach ($this->checkQueue as $check) {
             $check[0]($parsedValue);
@@ -67,10 +67,10 @@ abstract class AbstractSanitizrSchema
         return $parsedValue;
     }
 
-    public function safeParse(mixed $input): SafeParsedData
+    public function safeParse(mixed $input, string $path = ''): SafeParsedData
     {
         try {
-            $result = $this->parse($input);
+            $result = $this->parse($input, path: $path);
             return SafeParsedData::from(true, $result, null);
         } catch (SanitizrValidationException $e) {
             return SafeParsedData::from(false, null, $e->getMessage());
