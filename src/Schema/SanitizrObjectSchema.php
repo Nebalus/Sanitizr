@@ -28,13 +28,15 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
 
         foreach ($this->schemas as $prop => $schema) {
             if ($schema instanceof AbstractSanitizrSchema) {
+                $updatedPath = $path === '' ? $prop : $path . "." . $prop;
+
                 if ($schema->isOptional() === false && isset($input[$prop]) === false) {
-                    throw new SanitizrValidationException($path . "." . $prop . " is required");
+                    throw new SanitizrValidationException($updatedPath . " is required");
                 }
 
                 if ($schema instanceof SanitizrObjectSchema) {
                     if (isset($input[$prop]) && is_array($input[$prop])) {
-                        $result[$prop] = $schema->parseValue($input[$prop]);
+                        $result[$prop] = $schema->parseValue($input[$prop], path: $updatedPath);
                     }
                     continue;
                 }
