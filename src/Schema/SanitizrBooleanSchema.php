@@ -9,10 +9,10 @@ class SanitizrBooleanSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue($input): bool
+    protected function parseValue(mixed $input, string $message = 'Not a boolean value'): bool
     {
         if (! is_bool($input)) {
-            throw new SanitizrValidationException('Not a boolean value');
+            throw new SanitizrValidationException($message);
         }
 
         return $input;

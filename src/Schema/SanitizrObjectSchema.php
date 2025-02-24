@@ -14,14 +14,14 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input): array
+    protected function parseValue(mixed $input, string $message = 'Not an object'): array
     {
         if (is_object($input)) {
             $input = get_object_vars($input);
         }
 
         if (!is_array($input)) {
-            throw new SanitizrValidationException('Not an object');
+            throw new SanitizrValidationException($message);
         }
 
         $result = [];

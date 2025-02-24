@@ -2,9 +2,14 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Exception\SanitizrValidationException;
+
 class SanitizrFileSchema extends AbstractSanitizrSchema
 {
-    protected function parseValue(mixed $input): mixed
+    /**
+     * @throws SanitizrValidationException
+     */
+    protected function parseValue(mixed $input, string $message = "Not a File"): mixed
     {
         // TODO: Implement parseValue() method.
     }

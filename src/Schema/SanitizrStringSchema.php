@@ -117,10 +117,10 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input): string
+    protected function parseValue(mixed $input, string $message = 'Not a string value'): string
     {
         if (! is_string($input)) {
-            throw new SanitizrValidationException('Not a string value');
+            throw new SanitizrValidationException($message);
         }
 
         return $input;
