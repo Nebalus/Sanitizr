@@ -9,7 +9,7 @@ class SanitizrDateSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = 'Value must be an DATE', string $path = ''): mixed
+    protected function parseValue(mixed $input, string $message = '%s must be an DATE', string $path = ''): mixed
     {
         // TODO: Implement parseValue() method.
     }
