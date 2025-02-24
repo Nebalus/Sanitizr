@@ -80,5 +80,5 @@ abstract class AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    abstract protected function parseValue(mixed $input): mixed;
+    abstract protected function parseValue(mixed $input, string $message, string $path = ''): mixed;
 }

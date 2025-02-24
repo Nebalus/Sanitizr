@@ -14,7 +14,7 @@ class SanitizrArraySchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = 'Value must be an ARRAY'): array
+    protected function parseValue(mixed $input, string $message = 'Value must be an ARRAY', string $path = ''): array
     {
         if (! is_array($input)) {
             throw new SanitizrValidationException($message);
