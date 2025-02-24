@@ -14,7 +14,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = 'Not an object'): array
+    protected function parseValue(mixed $input, string $message = 'Value must be an OBJECT'): array
     {
         if (is_object($input)) {
             $input = get_object_vars($input);

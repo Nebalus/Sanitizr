@@ -9,7 +9,7 @@ class SanitizrFileSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = "Not a File"): mixed
+    protected function parseValue(mixed $input, string $message = "Value must be a path to an FILE"): mixed
     {
         // TODO: Implement parseValue() method.
     }
