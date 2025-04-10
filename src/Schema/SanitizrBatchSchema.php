@@ -32,7 +32,10 @@ class SanitizrBatchSchema extends AbstractSanitizrSchema
                 throw new SanitizrValidationException("The value a position " . $updatedPath . " is required");
             }
             $currentValue = $input[$iterator] ?? null;
-            $result[] = $schema->parseValue($currentValue, path: $updatedPath);
+            $result[] = $schema->parse(
+                $currentValue,
+                path: $updatedPath
+            );
 
             $iterator++;
         }
