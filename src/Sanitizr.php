@@ -52,7 +52,7 @@ class Sanitizr
 
     public static function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatchSchema
     {
-        return new SanitizrBatchSchema($schemas);
+        return new SanitizrBatchSchema(...$schemas);
     }
 
     public static function null(): SanitizrNullSchema
