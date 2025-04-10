@@ -46,6 +46,14 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * @return bool
+     */
+    public function isNullable(): bool
+    {
+        return $this->isNullable;
+    }
+
+    /**
      * @throws SanitizrValidationException
      */
     public function parse(mixed $input, string $path = ''): mixed

@@ -26,14 +26,14 @@ class SanitizrBatchSchema extends AbstractSanitizrSchema
 
         $iterator = 0;
         foreach ($this->schemas as $schema) {
-            $updatedPath = $path === '' ? $iterator : $path . "." . $iterator;
+            $updatedPath = $path === '' ? "KEY" . $iterator : $path . ".KEY" . $iterator;
 
-            if ($schema->isOptional() === false && isset($input[$iterator]) === false && is_null($input[$iterator]) === false) {
+            if ($schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false) {
                 throw new SanitizrValidationException("The value a position " . $updatedPath . " is required");
             }
             $currentValue = $input[$iterator] ?? null;
-            $schema->parse($currentValue);
-            $result[] = $schema->parse($currentValue);
+            $result[] = $schema->parseValue($currentValue, path: $updatedPath);
+
             $iterator++;
         }
 
