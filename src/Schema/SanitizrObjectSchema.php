@@ -36,7 +36,10 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
 
                 if ($schema instanceof SanitizrObjectSchema) {
                     if (isset($input[$prop]) && is_array($input[$prop])) {
-                        $result[$prop] = $schema->parseValue($input[$prop], path: $updatedPath);
+                        $result[$prop] = $schema->parseValue(
+                            $input[$prop],
+                            path: $updatedPath
+                        );
                     }
                     continue;
                 }
