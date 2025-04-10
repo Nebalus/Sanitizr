@@ -34,6 +34,7 @@ class SanitizrBatchSchema extends AbstractSanitizrSchema
             $currentValue = $input[$iterator] ?? null;
             $schema->parse($currentValue);
             $result[] = $schema->parse($currentValue);
+            $iterator++;
         }
 
         return $result;
