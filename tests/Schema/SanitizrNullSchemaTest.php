@@ -1,6 +1,6 @@
 <?php
 
-namespace Nebalus\tests\Schema;
+namespace UnitTesting\Schema;
 
 use PHPUnit\Framework\TestCase;
 

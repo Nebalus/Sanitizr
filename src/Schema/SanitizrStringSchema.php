@@ -6,6 +6,9 @@ use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrStringSchema extends AbstractSanitizrSchema
 {
+    /**
+     * @param int $length The string must be the exact length
+     */
     public function length(int $length, string $message = 'Must be exact %s characters long'): static
     {
         $this->addCheck(function (string $input) use ($length, $message) {

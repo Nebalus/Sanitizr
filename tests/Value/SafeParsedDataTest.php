@@ -1,6 +1,6 @@
 <?php
 
-namespace Nebalus\tests\Value;
+namespace UnitTesting\Value;
 
 use PHPUnit\Framework\TestCase;
 
