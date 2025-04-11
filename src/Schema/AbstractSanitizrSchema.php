@@ -40,7 +40,7 @@ abstract class AbstractSanitizrSchema
      * Is only used, if this schema is in an object schema
      * @return bool
      */
-    public function isOptional(): bool
+    protected function isOptional(): bool
     {
         return $this->isOptional;
     }
@@ -48,7 +48,7 @@ abstract class AbstractSanitizrSchema
     /**
      * @return bool
      */
-    public function isNullable(): bool
+    protected function isNullable(): bool
     {
         return $this->isNullable;
     }
