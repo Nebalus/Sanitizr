@@ -14,7 +14,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = '%s must be an OBJECT', string $path = ''): array
+    protected function parseValue(mixed $input, string $message = '%s must be an OBJECT or an ASSOCIATIVE ARRAY', string $path = ''): array
     {
         if (is_object($input)) {
             $input = get_object_vars($input);
@@ -34,17 +34,18 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                     throw new SanitizrValidationException($updatedPath . " is required");
                 }
 
-                if($schema->isOptional() === true && $schema->isNullable() === false && isset($input[$prop]) === false) {
+                if ($schema->isOptional() === true && $schema->isNullable() === false && isset($input[$prop]) === false) {
                     continue;
                 }
 
-                if($schema->isOptional() === true && $schema->isNullable() === true && isset($input[$prop]) === false) {
+                if ($schema->isOptional() === true && $schema->isNullable() === true && isset($input[$prop]) === false) {
+                    var_dump($prop);
                     $result[$prop] = null;
                     continue;
                 }
 
                 if ($schema instanceof SanitizrObjectSchema) {
-                    if (isset($input[$prop]) && is_array($input[$prop])) {
+                    if (isset($input[$prop])) {
                         $result[$prop] = $schema->parseValue(
                             $input[$prop],
                             path: $updatedPath

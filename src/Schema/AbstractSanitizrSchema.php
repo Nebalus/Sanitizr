@@ -18,18 +18,34 @@ abstract class AbstractSanitizrSchema
         $this->checkQueue[] = [$callable];
     }
 
+    /**
+     * Marks that the value can be optional
+     * NOTE: This is only used in an object schema
+     * @param string $message
+     * @return static
+     */
     public function optional(): static
     {
         $this->isOptional = true;
         return $this;
     }
 
+    /**
+     * Marks that the value can be null
+     * @param string $message
+     * @return static
+     */
     public function nullable(): static
     {
         $this->isNullable = true;
         return $this;
     }
 
+    /**
+     * Sets the default value, if the value is null or not defined when its optional in an object schema
+     * @param mixed $value
+     * @return static
+     */
     public function default(mixed $value): static
     {
         $this->defaultValue = $value;
@@ -54,6 +70,7 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Parse the input value
      * @throws SanitizrValidationException
      */
     public function parse(mixed $input, string $path = ''): mixed
@@ -75,6 +92,9 @@ abstract class AbstractSanitizrSchema
         return $parsedValue;
     }
 
+    /**
+     * Parses the input value and return a SafeParsedData object and will not throw an exception
+     */
     public function safeParse(mixed $input, string $path = ''): SafeParsedData
     {
         try {
