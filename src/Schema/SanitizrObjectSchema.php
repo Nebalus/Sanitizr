@@ -39,7 +39,6 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                 }
 
                 if ($schema->isOptional() === true && $schema->isNullable() === true && isset($input[$prop]) === false) {
-                    var_dump($prop);
                     $result[$prop] = null;
                     continue;
                 }
