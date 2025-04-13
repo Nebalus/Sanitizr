@@ -69,6 +69,16 @@ abstract class AbstractSanitizrSchema
         return $this->isNullable;
     }
 
+    protected function hasDefaultValue(): bool
+    {
+        return isset($this->defaultValue);
+    }
+
+    protected function getDefaultValue(): mixed
+    {
+        return $this->defaultValue;
+    }
+
     /**
      * Parse the input value
      * @throws SanitizrValidationException

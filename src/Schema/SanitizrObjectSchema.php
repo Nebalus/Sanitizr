@@ -34,12 +34,17 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                     throw new SanitizrValidationException($updatedPath . " is required");
                 }
 
-                if ($schema->isOptional() === true && $schema->isNullable() === false && isset($input[$prop]) === false) {
-                    continue;
-                }
+                if ($schema->isOptional() === true && isset($input[$prop]) === false) {
+                    if($schema->hasDefaultValue()) {
+                        $result[$prop] = $schema->getDefaultValue();
+                        continue;
+                    }
 
-                if ($schema->isOptional() === true && $schema->isNullable() === true && isset($input[$prop]) === false) {
-                    $result[$prop] = null;
+                    if ($schema->isNullable() === true) {
+                        $result[$prop] = null;
+                        continue;
+                    }
+
                     continue;
                 }
 
