@@ -11,10 +11,10 @@ trait SanitizrValueObjectTrait
     public static function getSchema(): AbstractSanitizrSchema
     {
         if (isset(self::$schemaCache)) {
-            return self::$schemaCache;
+            return clone self::$schemaCache;
         }
         self::$schemaCache = self::defineSchema();
-        return self::$schemaCache;
+        return clone self::$schemaCache;
     }
 
     abstract protected static function defineSchema(): AbstractSanitizrSchema;
