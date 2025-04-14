@@ -35,7 +35,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                 }
 
                 if ($schema->isOptional() === true && isset($input[$prop]) === false) {
-                    if($schema->hasDefaultValue()) {
+                    if ($schema->hasDefaultValue()) {
                         $result[$prop] = $schema->getDefaultValue();
                         continue;
                     }
