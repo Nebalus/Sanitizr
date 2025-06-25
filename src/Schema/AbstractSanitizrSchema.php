@@ -13,6 +13,9 @@ abstract class AbstractSanitizrSchema
     private bool $isNullable = false;
     private mixed $defaultValue;
 
+    private ?array $orSchemas = [];
+    private ?array $andSchemas = [];
+
     protected function addCheck(callable $callable): void
     {
         $this->checkQueue[] = [$callable];
@@ -49,6 +52,18 @@ abstract class AbstractSanitizrSchema
     public function default(mixed $value): static
     {
         $this->defaultValue = $value;
+        return $this;
+    }
+
+    public function or(AbstractSanitizrSchema $orSanitizerSchema): static
+    {
+        $this->orSchemas[] = $orSanitizerSchema;
+        return $this;
+    }
+
+    public function and(AbstractSanitizrSchema $andSanitizerSchema): static
+    {
+        $this->andSchemas[] = $andSanitizerSchema;
         return $this;
     }
 
@@ -93,13 +108,34 @@ abstract class AbstractSanitizrSchema
             return $this->defaultValue;
         }
 
-        $parsedValue = $this->parseValue($input, path: $path);
+        try {
+            $parsedValue = $this->parseValue($input, path: $path);
 
-        foreach ($this->checkQueue as $check) {
-            $check[0]($parsedValue);
+            foreach ($this->checkQueue as $check) {
+                $check[0]($parsedValue);
+            }
+
+            if ($this->andSchemas !== []) {
+                foreach ($this->andSchemas as $andSchema) {
+                    $andSchema->parse($parsedValue, path: $path);
+                }
+            }
+
+            return $parsedValue;
+        } catch (SanitizrValidationException $e) {
+            if ($this->orSchemas === []) {
+                throw $e;
+            }
+
+            foreach ($this->orSchemas as $orSchema) {
+                try {
+                    return $orSchema->parse($input, path: $path);
+                } catch (SanitizrValidationException) {
+                    // Ignore the exception and try the next schema
+                }
+            }
+            throw new SanitizrValidationException("No valid schema found for the input value at path: " . $path, 0, $e);
         }
-
-        return $parsedValue;
     }
 
     /**
