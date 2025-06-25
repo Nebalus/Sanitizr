@@ -98,7 +98,7 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
     public function equals(string $value, string $message = 'Is not equals to the required string'): static
     {
         $this->addCheck(function (string $input) use ($value, $message) {
-            if (!$input == $value) {
+            if (strcmp($input, $value) !== 0) {
                 throw new SanitizrValidationException($message);
             }
         });
