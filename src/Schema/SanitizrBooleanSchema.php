@@ -6,7 +6,7 @@ use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrBooleanSchema extends AbstractSanitizrSchema
 {
-    public function equals(boolean $value, string $message = 'Value is not equals to the required boolean %s'): static
+    public function equals(boolean $value, string $message = 'Is not equals to the required boolean %s'): static
     {
         $this->addCheck(function (boolean $input) use ($value, $message) {
             if ($input != $value) {
