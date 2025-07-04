@@ -7,6 +7,17 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 class SanitizrNumberSchema extends AbstractSanitizrSchema
 {
+    public function equals(int|float $value, string $message = 'Must be equals %s'): static
+    {
+        $this->addCheck(function (int|float $input) use ($value, $message) {
+            if ($input != $value) {
+                throw new SanitizrValidationException(sprintf($message, $value));
+            }
+        });
+
+        return $this;
+    }
+    
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
