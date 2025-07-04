@@ -17,7 +17,7 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
 
         return $this;
     }
-    
+
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
