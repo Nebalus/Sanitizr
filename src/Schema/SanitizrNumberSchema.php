@@ -7,7 +7,7 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 class SanitizrNumberSchema extends AbstractSanitizrSchema
 {
-    public function equals(int|float $value, string $message = 'Value is not equals to the required number %s'): static
+    public function equals(int|float $value, string $message = 'Is not equals to the required number %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input != $value) {
