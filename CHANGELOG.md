@@ -7,13 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0]
+## [2.0.0] - 2025-07-08
 ### Added 
-- Unittest Framework
-- Date Schema
-- File Schema
+- Unittest Framework (~PHPUnit)
 - Batch Schema
-- Added Check System
+- Null Schema
 
 [2.0.0]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.1
 
