@@ -45,7 +45,7 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Sets the default value, if the value is null or not defined when its optional in an object schema
+     * Sets the default value, if the value is null or not defined in an object schema
      * @param mixed $value
      * @return static
      */
