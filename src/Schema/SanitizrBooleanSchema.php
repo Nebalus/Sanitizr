@@ -23,7 +23,7 @@ class SanitizrBooleanSchema extends AbstractSanitizrSchema
     protected function parseValue(mixed $input, string $message = '%s must be an BOOLEAN', string $path = ''): bool
     {
         if (is_string($input)) {
-            $input = filter_var($input, FILTER_VALIDATE_BOOLEAN);
+            $input = filter_var($input, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }
 
         if (! is_bool($input)) {
