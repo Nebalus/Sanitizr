@@ -11,6 +11,8 @@ abstract class AbstractSanitizrSchema
 
     private bool $isOptional = false;
     private bool $isNullable = false;
+
+    private bool $hasDefaultValue = false;
     private mixed $defaultValue;
 
     private ?array $orSchemas = [];
@@ -22,9 +24,8 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Marks that the value can be optional
+     * Marks that the value can be optional, means the validation will not fail if the field is not present
      * NOTE: This is only used in an object schema
-     * @param string $message
      * @return static
      */
     public function optional(): static
@@ -35,7 +36,6 @@ abstract class AbstractSanitizrSchema
 
     /**
      * Marks that the value can be null
-     * @param string $message
      * @return static
      */
     public function nullable(): static
@@ -51,6 +51,7 @@ abstract class AbstractSanitizrSchema
      */
     public function default(mixed $value): static
     {
+        $this->hasDefaultValue = true;
         $this->defaultValue = $value;
         return $this;
     }
@@ -86,7 +87,7 @@ abstract class AbstractSanitizrSchema
 
     protected function hasDefaultValue(): bool
     {
-        return isset($this->defaultValue);
+        return $this->hasDefaultValue;
     }
 
     protected function getDefaultValue(): mixed
@@ -104,7 +105,7 @@ abstract class AbstractSanitizrSchema
             return null;
         }
 
-        if (is_null($input) && isset($this->defaultValue)) {
+        if (is_null($input) && $this->hasDefaultValue()) {
             return $this->defaultValue;
         }
 

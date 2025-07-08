@@ -30,26 +30,17 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
             if ($schema instanceof AbstractSanitizrSchema) {
                 $updatedPath = $path === '' ? $prop : $path . "." . $prop;
 
-                if ($schema->isOptional() === false && isset($input[$prop]) === false) {
-                    throw new SanitizrValidationException($updatedPath . " is required");
-                }
-
-                if ($schema->isOptional() === true && isset($input[$prop]) === false) {
-                    if ($schema->hasDefaultValue()) {
-                        $result[$prop] = $schema->getDefaultValue();
-                        continue;
-                    }
-
-                    if ($schema->isNullable() === true) {
-                        $result[$prop] = null;
-                        continue;
-                    }
-
+                if ($schema->hasDefaultValue() && array_key_exists($prop, $input) === false) {
+                    $result[$prop] = $schema->getDefaultValue();
                     continue;
                 }
 
+                if ($schema->isOptional() === false && array_key_exists($prop, $input) === false) {
+                    throw new SanitizrValidationException($updatedPath . " is required");
+                }
+
                 if ($schema instanceof SanitizrObjectSchema) {
-                    if (isset($input[$prop])) {
+                    if (array_key_exists($prop, $input)) {
                         $result[$prop] = $schema->parseValue(
                             $input[$prop],
                             path: $updatedPath
