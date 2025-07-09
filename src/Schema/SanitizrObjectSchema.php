@@ -40,13 +40,8 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                 }
 
                 if ($schema->isOptional() === true && array_key_exists($prop, $input) === false) {
-                    if ($schema->isNullable() === true) {
-                        $result[$prop] = null;
-                        continue;
-                    }
                     continue;
                 }
-
 
                 if ($schema instanceof SanitizrObjectSchema) {
                     if (array_key_exists($prop, $input)) {
