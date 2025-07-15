@@ -6,6 +6,7 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Schema\SanitizrBatchSchema;
 use Nebalus\Sanitizr\Schema\SanitizrArraySchema;
 use Nebalus\Sanitizr\Schema\SanitizrBooleanSchema;
+use Nebalus\Sanitizr\Schema\SanitizrLiterallySchema;
 use Nebalus\Sanitizr\Schema\SanitizrNullSchema;
 use Nebalus\Sanitizr\Schema\SanitizrNumberSchema;
 use Nebalus\Sanitizr\Schema\SanitizrObjectSchema;
@@ -13,6 +14,11 @@ use Nebalus\Sanitizr\Schema\SanitizrStringSchema;
 
 class SanitizrStatic
 {
+    public static function literally(mixed $literallyValue): SanitizrLiterallySchema
+    {
+        return new SanitizrLiterallySchema($literallyValue);
+    }
+
     public static function boolean(): SanitizrBooleanSchema
     {
         return new SanitizrBooleanSchema();
