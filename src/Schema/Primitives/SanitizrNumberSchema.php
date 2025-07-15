@@ -1,6 +1,6 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema;
+namespace Nebalus\Sanitizr\Schema\Primitives;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
