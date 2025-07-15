@@ -62,6 +62,38 @@ class SanitizrStringSchema extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function uppercase(string $message = 'Must be uppercase'): static
+    {
+        $this->addCheck(function (string $input) use ($message) {
+            if ($input !== strtoupper($input)) {
+                throw new SanitizrValidationException($message);
+            }
+        });
+
+        return $this;
+    }
+
+    public function lowercase(string $message = 'Must be lowercase'): static
+    {
+        $this->addCheck(function (string $input) use ($message) {
+            if ($input !== strtolower($input)) {
+                throw new SanitizrValidationException($message);
+            }
+        });
+
+        return $this;
+    }
+
+    public function includes(string $needle, string $message = 'Must include "%s"'): static
+    {
+        $this->addCheck(function (string $input) use ($needle, $message) {
+            if (!str_contains($input, $needle)) {
+                throw new SanitizrValidationException(sprintf($message, $needle));
+            }
+        });
+
+        return $this;
+    }
 
     public function regex(string $pattern, string $message = 'Does not match the pattern'): static
     {
