@@ -53,4 +53,9 @@ class SanitizrStatic
     {
         return new SanitizrNull();
     }
+
+    public static function nullable(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
+    {
+        return $schema->nullable();
+    }
 }

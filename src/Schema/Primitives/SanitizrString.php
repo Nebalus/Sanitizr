@@ -177,6 +177,15 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function toTitleCase(): static
+    {
+        $this->addTransform(function (string $input): string {
+            return ucwords(strtolower($input));
+        });
+
+        return $this;
+    }
+
     /**
      * @throws SanitizrValidationException
      */
