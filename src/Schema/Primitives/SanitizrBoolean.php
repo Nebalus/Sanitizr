@@ -7,17 +7,6 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 class SanitizrBoolean extends AbstractSanitizrSchema
 {
-    public function equals(bool $value, string $message = 'Is not equals to the required boolean %s'): static
-    {
-        $this->addCheck(function (bool $input) use ($value, $message) {
-            if ($input != $value) {
-                throw new SanitizrValidationException(sprintf($message, $value));
-            }
-        });
-
-        return $this;
-    }
-
     /**
      * @throws SanitizrValidationException
      */

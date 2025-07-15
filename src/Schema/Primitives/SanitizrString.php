@@ -128,17 +128,6 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function equals(string $value, string $message = 'Is not equals to the required string'): static
-    {
-        $this->addCheck(function (string $input) use ($value, $message) {
-            if (strcmp($input, $value) !== 0) {
-                throw new SanitizrValidationException($message);
-            }
-        });
-
-        return $this;
-    }
-
     public function startsWith(string $prefix, string $message = 'Does not start with required string'): static
     {
         $this->addCheck(function (string $input) use ($prefix, $message) {
