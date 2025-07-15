@@ -13,7 +13,7 @@ class SanitizrLiteral extends AbstractSanitizrSchema
 
     protected function parseValue(mixed $input, string $message = '%s must be literally "%s"', string $path = ''): mixed
     {
-        if (! $this->literalValue === $input) {
+        if ($this->literalValue === $input) {
             return $input;
         }
 
