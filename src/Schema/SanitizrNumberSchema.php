@@ -128,10 +128,10 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function multipleOf(int $multiple, string $message = 'Must be a multiple of %s'): static
+    public function multipleOf(int|float $multiple, string $message = 'Must be a multiple of %s'): static
     {
-        $this->addCheck(function (int $input) use ($multiple, $message) {
-            if ($input % $multiple !== 0) {
+        $this->addCheck(function (int|float $input) use ($multiple, $message) {
+            if ($input % $multiple != 0) {
                 throw new SanitizrValidationException(sprintf($message, $multiple));
             }
         });
@@ -144,7 +144,6 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
     {
-        
         if (! is_numeric($input)) {
             throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
         }
