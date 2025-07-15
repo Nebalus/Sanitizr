@@ -4,7 +4,7 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrArraySchema extends AbstractSanitizrSchema
+class SanitizrArray extends AbstractSanitizrSchema
 {
     public function __construct(
         private readonly AbstractSanitizrSchema $schema

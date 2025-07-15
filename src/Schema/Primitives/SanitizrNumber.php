@@ -5,7 +5,7 @@ namespace Nebalus\Sanitizr\Schema\Primitives;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
-class SanitizrNumberSchema extends AbstractSanitizrSchema
+class SanitizrNumber extends AbstractSanitizrSchema
 {
     public function equals(int|float $value, string $message = 'Is not equals to the required number %s'): static
     {

@@ -4,7 +4,7 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrNullSchema extends AbstractSanitizrSchema
+class SanitizrNull extends AbstractSanitizrSchema
 {
     /**
      * @throws SanitizrValidationException

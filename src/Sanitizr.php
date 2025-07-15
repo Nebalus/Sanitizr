@@ -3,54 +3,54 @@
 namespace Nebalus\Sanitizr;
 
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrBooleanSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrNumberSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrStringSchema;
-use Nebalus\Sanitizr\Schema\SanitizrArraySchema;
-use Nebalus\Sanitizr\Schema\SanitizrBatchSchema;
-use Nebalus\Sanitizr\Schema\SanitizrLiteralSchema;
-use Nebalus\Sanitizr\Schema\SanitizrNullSchema;
-use Nebalus\Sanitizr\Schema\SanitizrObjectSchema;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrBoolean;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrNumber;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrString;
+use Nebalus\Sanitizr\Schema\SanitizrArray;
+use Nebalus\Sanitizr\Schema\SanitizrBatch;
+use Nebalus\Sanitizr\Schema\SanitizrLiteral;
+use Nebalus\Sanitizr\Schema\SanitizrNull;
+use Nebalus\Sanitizr\Schema\SanitizrObject;
 
 class Sanitizr
 {
-    public function literal(mixed $literalValue): SanitizrLiteralSchema
+    public function literal(mixed $literalValue): SanitizrLiteral
     {
-        return new SanitizrLiteralSchema($literalValue);
+        return new SanitizrLiteral($literalValue);
     }
 
-    public function boolean(): SanitizrBooleanSchema
+    public function boolean(): SanitizrBoolean
     {
-        return new SanitizrBooleanSchema();
+        return new SanitizrBoolean();
     }
 
-    public function number(): SanitizrNumberSchema
+    public function number(): SanitizrNumber
     {
-        return new SanitizrNumberSchema();
+        return new SanitizrNumber();
     }
 
-    public function string(): SanitizrStringSchema
+    public function string(): SanitizrString
     {
-        return new SanitizrStringSchema();
+        return new SanitizrString();
     }
 
-    public function array(AbstractSanitizrSchema $schema): SanitizrArraySchema
+    public function array(AbstractSanitizrSchema $schema): SanitizrArray
     {
-        return new SanitizrArraySchema($schema);
+        return new SanitizrArray($schema);
     }
 
-    public function object(array $schemas): SanitizrObjectSchema
+    public function object(array $schemas): SanitizrObject
     {
-        return new SanitizrObjectSchema($schemas);
+        return new SanitizrObject($schemas);
     }
 
-    public function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatchSchema
+    public function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatch
     {
-        return new SanitizrBatchSchema(...$schemas);
+        return new SanitizrBatch(...$schemas);
     }
 
-    public function null(): SanitizrNullSchema
+    public function null(): SanitizrNull
     {
-        return new SanitizrNullSchema();
+        return new SanitizrNull();
     }
 }

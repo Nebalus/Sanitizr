@@ -4,7 +4,7 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrBatchSchema extends AbstractSanitizrSchema
+class SanitizrBatch extends AbstractSanitizrSchema
 {
     private array $schemas;
     public function __construct(

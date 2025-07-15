@@ -5,7 +5,7 @@ namespace Nebalus\Sanitizr\Schema\Primitives;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
-class SanitizrStringSchema extends AbstractSanitizrSchema
+class SanitizrString extends AbstractSanitizrSchema
 {
     /**
      * @param int $length The string must be the exact length

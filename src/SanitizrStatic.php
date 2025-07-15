@@ -3,54 +3,54 @@
 namespace Nebalus\Sanitizr;
 
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrBooleanSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrNumberSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrStringSchema;
-use Nebalus\Sanitizr\Schema\SanitizrArraySchema;
-use Nebalus\Sanitizr\Schema\SanitizrBatchSchema;
-use Nebalus\Sanitizr\Schema\SanitizrLiteralSchema;
-use Nebalus\Sanitizr\Schema\SanitizrNullSchema;
-use Nebalus\Sanitizr\Schema\SanitizrObjectSchema;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrBoolean;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrNumber;
+use Nebalus\Sanitizr\Schema\Primitives\SanitizrString;
+use Nebalus\Sanitizr\Schema\SanitizrArray;
+use Nebalus\Sanitizr\Schema\SanitizrBatch;
+use Nebalus\Sanitizr\Schema\SanitizrLiteral;
+use Nebalus\Sanitizr\Schema\SanitizrNull;
+use Nebalus\Sanitizr\Schema\SanitizrObject;
 
 class SanitizrStatic
 {
-    public static function literally(mixed $literallyValue): SanitizrLiteralSchema
+    public static function literally(mixed $literallyValue): SanitizrLiteral
     {
-        return new SanitizrLiteralSchema($literallyValue);
+        return new SanitizrLiteral($literallyValue);
     }
 
-    public static function boolean(): SanitizrBooleanSchema
+    public static function boolean(): SanitizrBoolean
     {
-        return new SanitizrBooleanSchema();
+        return new SanitizrBoolean();
     }
 
-    public static function number(): SanitizrNumberSchema
+    public static function number(): SanitizrNumber
     {
-        return new SanitizrNumberSchema();
+        return new SanitizrNumber();
     }
 
-    public static function string(): SanitizrStringSchema
+    public static function string(): SanitizrString
     {
-        return new SanitizrStringSchema();
+        return new SanitizrString();
     }
 
-    public static function array(AbstractSanitizrSchema $schema): SanitizrArraySchema
+    public static function array(AbstractSanitizrSchema $schema): SanitizrArray
     {
-        return new SanitizrArraySchema($schema);
+        return new SanitizrArray($schema);
     }
 
-    public static function object(array $schemas): SanitizrObjectSchema
+    public static function object(array $schemas): SanitizrObject
     {
-        return new SanitizrObjectSchema($schemas);
+        return new SanitizrObject($schemas);
     }
 
-    public static function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatchSchema
+    public static function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatch
     {
-        return new SanitizrBatchSchema(...$schemas);
+        return new SanitizrBatch(...$schemas);
     }
 
-    public static function null(): SanitizrNullSchema
+    public static function null(): SanitizrNull
     {
-        return new SanitizrNullSchema();
+        return new SanitizrNull();
     }
 }

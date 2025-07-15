@@ -4,7 +4,7 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrObjectSchema extends AbstractSanitizrSchema
+class SanitizrObject extends AbstractSanitizrSchema
 {
     public function __construct(
         private readonly array $schemas
@@ -43,7 +43,7 @@ class SanitizrObjectSchema extends AbstractSanitizrSchema
                     continue;
                 }
 
-                if ($schema instanceof SanitizrObjectSchema) {
+                if ($schema instanceof SanitizrObject) {
                     if (array_key_exists($prop, $input)) {
                         $result[$prop] = $schema->parseValue(
                             $input[$prop],

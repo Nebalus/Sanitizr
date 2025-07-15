@@ -4,7 +4,7 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrLiteralSchema extends AbstractSanitizrSchema
+class SanitizrLiteral extends AbstractSanitizrSchema
 {
     public function __construct(
         private readonly mixed $literalValue

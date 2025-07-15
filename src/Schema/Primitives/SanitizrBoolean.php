@@ -5,7 +5,7 @@ namespace Nebalus\Sanitizr\Schema\Primitives;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
-class SanitizrBooleanSchema extends AbstractSanitizrSchema
+class SanitizrBoolean extends AbstractSanitizrSchema
 {
     public function equals(bool $value, string $message = 'Is not equals to the required boolean %s'): static
     {
