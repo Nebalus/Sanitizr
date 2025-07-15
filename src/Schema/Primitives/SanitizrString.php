@@ -150,6 +150,33 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function trim(): static
+    {
+        $this->addTransform(function (string $input): string {
+            return trim($input);
+        });
+
+        return $this;
+    }
+
+    public function toLowerCase(): static
+    {
+        $this->addTransform(function (string $input): string {
+            return strtolower($input);
+        });
+
+        return $this;
+    }
+
+    public function toUpperCase(): static
+    {
+        $this->addTransform(function (string $input): string {
+            return strtoupper($input);
+        });
+
+        return $this;
+    }
+
     /**
      * @throws SanitizrValidationException
      */

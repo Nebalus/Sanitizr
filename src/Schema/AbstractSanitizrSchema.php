@@ -7,6 +7,7 @@ use Nebalus\Sanitizr\Value\SafeParsedData;
 
 abstract class AbstractSanitizrSchema
 {
+    private array $transformQueue = [];
     private array $checkQueue = [];
 
     private bool $isOptional = false;
@@ -17,6 +18,11 @@ abstract class AbstractSanitizrSchema
 
     private ?array $orSchemas = [];
     private ?array $andSchemas = [];
+
+    protected function addTransform(callable $transform): void
+    {
+        $this->transformQueue[] = [$transform];
+    }
 
     protected function addCheck(callable $callable): void
     {
@@ -35,6 +41,17 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Marks that the value is not optional, means the validation will fail if the field is not present
+     * NOTE: This is only used in an object schema
+     * @return static
+     */
+    public function nonOptional(): static
+    {
+        $this->isOptional = false;
+        return $this;
+    }
+
+    /**
      * Marks that the value can be null
      * @return static
      */
@@ -44,6 +61,11 @@ abstract class AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Marks that the value can be NULL or OPTIONAL
+     * means the validation will not fail if the field is not present or if it is null
+     * @return static
+     */
     public function nullish(): static
     {
         $this->isNullable = true;
@@ -123,6 +145,10 @@ abstract class AbstractSanitizrSchema
 
         try {
             $parsedValue = $this->parseValue($input, path: $path);
+
+            foreach ($this->transformQueue as $value) {
+                $parsedValue = $value[0]($parsedValue);
+            }
 
             foreach ($this->checkQueue as $check) {
                 $check[0]($parsedValue);
