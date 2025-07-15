@@ -58,4 +58,19 @@ class SanitizrStatic
     {
         return $schema->nullable();
     }
+
+    public static function nullish(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
+    {
+        return $schema->nullish();
+    }
+
+    public static function optional(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
+    {
+        return $schema->optional();
+    }
+
+    public static function nonOptional(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
+    {
+        return $schema->nonOptional();
+    }
 }
