@@ -44,6 +44,13 @@ abstract class AbstractSanitizrSchema
         return $this;
     }
 
+    public function nullish(): static
+    {
+        $this->isNullable = true;
+        $this->isOptional = true;
+        return $this;
+    }
+
     /**
      * Sets the default value, if the value is null or not defined in an object schema
      * @param mixed $value
@@ -72,7 +79,7 @@ abstract class AbstractSanitizrSchema
      * Is only used, if this schema is in an object schema
      * @return bool
      */
-    protected function isOptional(): bool
+    public function isOptional(): bool
     {
         return $this->isOptional;
     }
@@ -80,17 +87,22 @@ abstract class AbstractSanitizrSchema
     /**
      * @return bool
      */
-    protected function isNullable(): bool
+    public function isNullable(): bool
     {
         return $this->isNullable;
     }
 
-    protected function hasDefaultValue(): bool
+    public function isNullish()
+    {
+        return $this->isNullable && $this->isOptional();
+    }
+
+    public function hasDefaultValue(): bool
     {
         return $this->hasDefaultValue;
     }
 
-    protected function getDefaultValue(): mixed
+    public function getDefaultValue(): mixed
     {
         return $this->defaultValue;
     }
