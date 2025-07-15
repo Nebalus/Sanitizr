@@ -1,6 +1,6 @@
 <?php
 
-namespace Nebalus\Sanitizr\Value;
+namespace Nebalus\Sanitizr\Trait;
 
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
