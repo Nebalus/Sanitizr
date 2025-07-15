@@ -14,7 +14,7 @@ use Nebalus\Sanitizr\Schema\SanitizrObject;
 
 class SanitizrStatic
 {
-    public static function literally(mixed $value): SanitizrLiteral
+    public static function literal(mixed $value): SanitizrLiteral
     {
         return new SanitizrLiteral($value);
     }
