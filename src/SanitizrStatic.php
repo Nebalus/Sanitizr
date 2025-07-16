@@ -56,21 +56,25 @@ class SanitizrStatic
 
     public static function nullable(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
     {
-        return $schema->nullable();
+        $clonedSchema = clone $schema;
+        return $clonedSchema->nullable();
     }
 
     public static function nullish(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
     {
-        return $schema->nullish();
+        $clonedSchema = clone $schema;
+        return $clonedSchema->nullish();
     }
 
     public static function optional(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
     {
-        return $schema->optional();
+        $clonedSchema = clone $schema;
+        return $clonedSchema->optional();
     }
 
     public static function nonOptional(AbstractSanitizrSchema $schema): AbstractSanitizrSchema
     {
-        return $schema->nonOptional();
+        $clonedSchema = clone $schema;
+        return $clonedSchema->nonOptional();
     }
 }
