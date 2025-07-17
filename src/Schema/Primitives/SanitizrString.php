@@ -186,6 +186,25 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function stripTags($allowedTags = null): static
+    {
+        $this->addTransform(function (string $input) use ($allowedTags): string {
+            return strip_tags($input, $allowedTags);
+        });
+
+        return $this;
+    }
+
+    public function htmlSpecialChars(int $flags = ENT_QUOTES | ENT_SUBSTITUTE, ?string $encoding = null, bool $doubleEncode = true): static
+    {
+        $this->addTransform(function (string $input) use ($doubleEncode, $encoding, $flags): string {
+            return htmlspecialchars($input, $flags, $encoding, $doubleEncode);
+        });
+
+        return $this;
+    }
+
+
     /**
      * @throws SanitizrValidationException
      */
