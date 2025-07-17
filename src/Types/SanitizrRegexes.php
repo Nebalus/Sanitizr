@@ -2,7 +2,7 @@
 
 namespace Nebalus\Sanitizr\Types;
 
-class Regexes
+final class SanitizrRegexes
 {
 
 }

@@ -4,13 +4,14 @@ namespace Nebalus\Sanitizr\Schema\Primitives;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Types\SanitizrErrorMessages;
 
 class SanitizrString extends AbstractSanitizrSchema
 {
     /**
      * @param int $length The string must be the exact length
      */
-    public function length(int $length, string $message = 'Must be exact %s characters long'): static
+    public function length(int $length, string $message = SanitizrErrorMessages::STRING_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($length, $message) {
             $inputLength = strlen($input);
@@ -23,7 +24,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function min(int $min, string $message = 'Must be %s or more characters long'): static
+    public function min(int $min, string $message = SanitizrErrorMessages::STRING_MIN_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($min, $message) {
             $inputLength = strlen($input);
@@ -36,7 +37,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function max(int $max, string $message = 'Must be %s or fewer characters long'): static
+    public function max(int $max, string $message = SanitizrErrorMessages::STRING_MAX_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($max, $message) {
             $inputLength = strlen($input);
@@ -49,7 +50,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function between(int $min, int $max, string $message = 'Must be between %s and %s'): static
+    public function between(int $min, int $max, string $message = SanitizrErrorMessages::STRING_BETWEEN_RANGE): static
     {
         $this->addCheck(function (string $input) use ($min, $max, $message) {
             $inputLength = strlen($input);
@@ -62,7 +63,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function uppercase(string $message = 'Must be uppercase'): static
+    public function uppercase(string $message = SanitizrErrorMessages::STRING_ONLY_UPPERCASE): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if ($input !== strtoupper($input)) {
@@ -73,7 +74,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function lowercase(string $message = 'Must be lowercase'): static
+    public function lowercase(string $message = SanitizrErrorMessages::STRING_ONLY_LOWERCASE): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if ($input !== strtolower($input)) {
@@ -84,7 +85,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function includes(string $needle, string $message = 'Must include "%s"'): static
+    public function includes(string $needle, string $message = SanitizrErrorMessages::STRING_MUST_INCLUDE): static
     {
         $this->addCheck(function (string $input) use ($needle, $message) {
             if (!str_contains($input, $needle)) {
@@ -95,7 +96,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function regex(string $pattern, string $message = 'Does not match the pattern'): static
+    public function regex(string $pattern, string $message = SanitizrErrorMessages::STRING_NOT_MATCHING_REGEX): static
     {
         $this->addCheck(function (string $input) use ($pattern, $message) {
             if (! preg_match($pattern, $input)) {
@@ -106,7 +107,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function email(string $message = 'Not a valid email address'): static
+    public function email(string $message = SanitizrErrorMessages::STRING_NOT_EMAIL): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_EMAIL)) {
@@ -117,7 +118,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function url(string $message = 'Not a valid URL'): static
+    public function url(string $message = SanitizrErrorMessages::STRING_NOT_URL): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
@@ -128,7 +129,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function startsWith(string $prefix, string $message = 'Does not start with required string'): static
+    public function startsWith(string $prefix, string $message = SanitizrErrorMessages::STRING_MUST_START_WITH): static
     {
         $this->addCheck(function (string $input) use ($prefix, $message) {
             if (str_starts_with($input, $prefix) === false) {
@@ -139,7 +140,7 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function endsWith(string $suffix, string $message = 'Does not end with required string'): static
+    public function endsWith(string $suffix, string $message = SanitizrErrorMessages::STRING_MUST_END_WITH): static
     {
         $this->addCheck(function (string $input) use ($suffix, $message) {
             if (str_ends_with($input, $suffix) === false) {
