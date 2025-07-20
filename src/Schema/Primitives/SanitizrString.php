@@ -4,6 +4,7 @@ namespace Nebalus\Sanitizr\Schema\Primitives;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
 use Nebalus\Sanitizr\Types\SanitizrErrorMessages;
 
 class SanitizrString extends AbstractSanitizrSchema
