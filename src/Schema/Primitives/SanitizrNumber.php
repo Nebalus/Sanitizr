@@ -10,6 +10,13 @@ class SanitizrNumber extends AbstractSanitizrSchema
 {
     use SchemaStringableTrait;
 
+    /**
+     * Adds a validation rule that requires the input to be strictly greater than the specified value.
+     *
+     * @param int|float $value The value that the input must be greater than.
+     * @param string $message Optional custom error message. Use '%s' as a placeholder for the value.
+     * @return static The current schema instance for method chaining.
+     */
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
@@ -109,6 +116,12 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a validation rule that requires the input to be greater than or equal to zero.
+     *
+     * @param string $message Custom error message if the input is negative.
+     * @return static
+     */
     public function nonNegative(string $message = 'Must be a positive number or 0'): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
@@ -120,6 +133,13 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a validation rule that requires the input to be a multiple of the specified number.
+     *
+     * @param int|float $multiple The number that the input must be a multiple of.
+     * @param string $message The error message to use if validation fails.
+     * @return static The current schema instance for method chaining.
+     */
     public function multipleOf(int|float $multiple, string $message = 'Must be a multiple of %s'): static
     {
         $this->addCheck(function (int|float $input) use ($multiple, $message) {
@@ -132,7 +152,15 @@ class SanitizrNumber extends AbstractSanitizrSchema
     }
 
     /**
-     * @throws SanitizrValidationException
+     * Parses and validates that the input is numeric, optionally sanitizing stringable input.
+     *
+     * If the input is not numeric after optional sanitization, throws a SanitizrValidationException with a formatted message.
+     *
+     * @param mixed $input The value to validate as numeric.
+     * @param string $message The error message template, with a placeholder for the path or value.
+     * @param string $path The path or label to include in the error message.
+     * @return int|float The validated numeric value.
+     * @throws SanitizrValidationException If the input is not numeric.
      */
     protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
     {
