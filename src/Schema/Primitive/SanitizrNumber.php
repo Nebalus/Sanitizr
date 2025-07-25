@@ -1,10 +1,11 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema\Primitives;
+namespace Nebalus\Sanitizr\Schema\Primitive;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
+use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
 
 class SanitizrNumber extends AbstractSanitizrSchema
 {
@@ -17,7 +18,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
      * @param string $message Optional custom error message. Use '%s' as a placeholder for the value.
      * @return static The current schema instance for method chaining.
      */
-    public function gt(int|float $value, string $message = 'Must be greater than %s'): static
+    public function gt(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_GREATER_THAN): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input < $value) {
@@ -28,7 +29,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function gte(int|float $value, string $message = 'Must be greater than or equal to %s'): static
+    public function gte(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_GREATER_THAN_OR_EQUAL): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input <= $value) {
@@ -39,7 +40,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function lt(int|float $value, string $message = 'Must be less than %s'): static
+    public function lt(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_LESS_THAN): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input > $value) {
@@ -50,7 +51,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function lte(int|float $value, string $message = 'Must be less than or equal to %s'): static
+    public function lte(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_LESS_THAN_OR_EQUAL): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
             if ($input >= $value) {
@@ -61,7 +62,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function float(string $message = 'Must be an float number'): static
+    public function float(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_FLOAT): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if (! is_float($input)) {
@@ -72,7 +73,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function integer(string $message = 'Must be an integer number'): static
+    public function integer(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_INTEGER): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if (! is_int($input)) {
@@ -83,7 +84,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function positive(string $message = 'Must be a positive number'): static
+    public function positive(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_POSITIVE): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if ($input <= 0) {
@@ -94,7 +95,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function nonPositive(string $message = 'Must be a negative number or 0'): static
+    public function nonPositive(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NONPOSITIVE): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if ($input > 0) {
@@ -105,7 +106,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function negative(string $message = 'Must be a negative number'): static
+    public function negative(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NEGATIVE): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if ($input >= 0) {
@@ -122,7 +123,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
      * @param string $message Custom error message if the input is negative.
      * @return static
      */
-    public function nonNegative(string $message = 'Must be a positive number or 0'): static
+    public function nonNegative(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NONNEGATIVE): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
             if ($input < 0) {
@@ -134,13 +135,12 @@ class SanitizrNumber extends AbstractSanitizrSchema
     }
 
     /**
-     * Adds a validation rule that requires the input to be a multiple of the specified number.
+     * Adds a validation rule that requires the input to be greater than or equal to zero.
      *
-     * @param int|float $multiple The number that the input must be a multiple of.
-     * @param string $message The error message to use if validation fails.
-     * @return static The current schema instance for method chaining.
+     * @param string $message Custom error message if the input is negative.
+     * @return static
      */
-    public function multipleOf(int|float $multiple, string $message = 'Must be a multiple of %s'): static
+    public function multipleOf(int|float $multiple, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_MULTIPLE_OF): static
     {
         $this->addCheck(function (int|float $input) use ($multiple, $message) {
             if ($input % $multiple != 0) {
@@ -162,9 +162,9 @@ class SanitizrNumber extends AbstractSanitizrSchema
      * @return int|float The validated numeric value.
      * @throws SanitizrValidationException If the input is not numeric.
      */
-    protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
+    protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_NUMERIC, string $path = ''): int
     {
-        if ($this->isStringable) {
+        if ($this->isStringable) { // TODO Check if an the Number is a float or an integer
             $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_NULL_ON_FAILURE);
         }
 

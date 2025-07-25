@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace UnitTesting;
+namespace Schema\Primitive;
 
 use PHPUnit\Framework\TestCase;
 
-class SanitizrTest extends TestCase
+class SanitizrNullTest extends TestCase
 {
-
 }

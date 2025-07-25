@@ -3,13 +3,13 @@
 namespace Nebalus\Sanitizr;
 
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrBoolean;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrNumber;
-use Nebalus\Sanitizr\Schema\Primitives\SanitizrString;
+use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
+use Nebalus\Sanitizr\Schema\Primitive\SanitizrNull;
+use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
+use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
 use Nebalus\Sanitizr\Schema\SanitizrBatch;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
-use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 
 class Sanitizr
@@ -146,5 +146,17 @@ class Sanitizr
     {
         $clonedSchema = clone $schema;
         return $clonedSchema->nonOptional();
+    }
+
+    public function float(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->float();
+    }
+
+    public function integer(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->integer();
     }
 }

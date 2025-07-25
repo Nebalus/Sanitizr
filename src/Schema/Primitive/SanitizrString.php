@@ -1,10 +1,10 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema\Primitives;
+namespace Nebalus\Sanitizr\Schema\Primitive;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
+use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
 use Nebalus\Sanitizr\Types\SanitizrErrorMessages;
 
 class SanitizrString extends AbstractSanitizrSchema
@@ -15,9 +15,8 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param int $length The required length of the string.
      * @param string $message Optional custom error message if validation fails.
      * @return static The current schema instance for method chaining.
-     * @throws SanitizrValidationException If the string does not have the specified length.
      */
-    public function length(int $length, string $message = SanitizrErrorMessages::STRING_LENGTH): static
+    public function length(int $length, string $message = SanitizrErrorMessage::STRING_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($length, $message) {
             $inputLength = strlen($input);
@@ -246,6 +245,13 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    public function transform(callable $transformer): static
+    {
+        $this->addTransform($transformer);
+
+        return $this;
+    }
+
     /**
      * Adds a transformation to trim whitespace from both ends of the string.
      *
@@ -344,7 +350,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @return string The validated string input.
      * @throws SanitizrValidationException If the input is not a string.
      */
-    protected function parseValue(mixed $input, string $message = '%s must be a STRING', string $path = ''): string
+    protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_STRING, string $path = ''): string
     {
         if (! is_string($input)) {
             throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));

@@ -1,0 +1,8 @@
+name: "sanitizr-phpcli"
+services:
+
+  php-cli:
+    build:
+      context: .
+      dockerfile: docker/php-cli/Dockerfile
+      target: executable

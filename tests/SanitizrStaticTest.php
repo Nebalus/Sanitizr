@@ -6,7 +6,6 @@ namespace UnitTesting;
 
 use PHPUnit\Framework\TestCase;
 
-class SanitizrTest extends TestCase
+class SanitizrStaticTest extends TestCase
 {
-
 }
