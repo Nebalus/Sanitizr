@@ -1,23 +1,22 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema;
+namespace Nebalus\Sanitizr\Schema\Primitives;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
 
-class SanitizrNumberSchema extends AbstractSanitizrSchema
+class SanitizrNumber extends AbstractSanitizrSchema
 {
-    public function equals(int|float $value, string $message = 'Is not equals to the required number %s'): static
-    {
-        $this->addCheck(function (int|float $input) use ($value, $message) {
-            if ($input != $value) {
-                throw new SanitizrValidationException(sprintf($message, $value));
-            }
-        });
+    use SchemaStringableTrait;
 
-        return $this;
-    }
-
+    /**
+     * Adds a validation rule that requires the input to be strictly greater than the specified value.
+     *
+     * @param int|float $value The value that the input must be greater than.
+     * @param string $message Optional custom error message. Use '%s' as a placeholder for the value.
+     * @return static The current schema instance for method chaining.
+     */
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
@@ -117,6 +116,12 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a validation rule that requires the input to be greater than or equal to zero.
+     *
+     * @param string $message Custom error message if the input is negative.
+     * @return static
+     */
     public function nonNegative(string $message = 'Must be a positive number or 0'): static
     {
         $this->addCheck(function (int|float $input) use ($message) {
@@ -128,10 +133,17 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function multipleOf(int $multiple, string $message = 'Must be a multiple of %s'): static
+    /**
+     * Adds a validation rule that requires the input to be a multiple of the specified number.
+     *
+     * @param int|float $multiple The number that the input must be a multiple of.
+     * @param string $message The error message to use if validation fails.
+     * @return static The current schema instance for method chaining.
+     */
+    public function multipleOf(int|float $multiple, string $message = 'Must be a multiple of %s'): static
     {
-        $this->addCheck(function (int $input) use ($multiple, $message) {
-            if ($input % $multiple !== 0) {
+        $this->addCheck(function (int|float $input) use ($multiple, $message) {
+            if ($input % $multiple != 0) {
                 throw new SanitizrValidationException(sprintf($message, $multiple));
             }
         });
@@ -140,11 +152,22 @@ class SanitizrNumberSchema extends AbstractSanitizrSchema
     }
 
     /**
-     * @throws SanitizrValidationException
+     * Parses and validates that the input is numeric, optionally sanitizing stringable input.
+     *
+     * If the input is not numeric after optional sanitization, throws a SanitizrValidationException with a formatted message.
+     *
+     * @param mixed $input The value to validate as numeric.
+     * @param string $message The error message template, with a placeholder for the path or value.
+     * @param string $path The path or label to include in the error message.
+     * @return int|float The validated numeric value.
+     * @throws SanitizrValidationException If the input is not numeric.
      */
     protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
     {
-        
+        if ($this->isStringable) {
+            $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_NULL_ON_FAILURE);
+        }
+
         if (! is_numeric($input)) {
             throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
         }
