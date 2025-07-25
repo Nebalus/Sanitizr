@@ -7,25 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2025-07-08
+
+## [1.0.0] - ???
 ### Added 
+- Schemas
+  - Primitives Schemas
+    - Boolean Schema
+    - Null Schema
+    - Number Schema
+    - String Schema
+  - Array Schema
+  - Batch Schema
+  - Literal Schema
+  - Object Schema
+- Instance based Factory (Sanitizr.php)
+- Static based Factory (SanitizrStatic.php)
+- SafeParse Mode
+- Value Object Trait for easier schema creation for a Value Object
+- Constant Based Error Messages
 - Unittest Framework (~PHPUnit)
-- Batch Schema
-- Null Schema
-
-[2.0.0]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.1
-
-
-## [1.0.1] - 2025-01-15
-### Added
-- Added PHP version requirements to composer.json
-
-[1.0.1]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.1
-
-
-## [1.0.0] - 2025-01-15
-### Added 
-- Added base structures
-- Added some Validation Schemas
 
 [1.0.0]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.0
