@@ -4,13 +4,17 @@ namespace Nebalus\Sanitizr\Schema\Primitive;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
 use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
+use Nebalus\Sanitizr\Types\SanitizrErrorMessages;
 
 class SanitizrString extends AbstractSanitizrSchema
 {
-    /**
-     * @param int $length The string must be exact the provided length
+    /****
+     * Adds a validation rule that requires the string to have an exact length.
+     *
+     * @param int $length The required length of the string.
+     * @param string $message Optional custom error message if validation fails.
+     * @return static The current schema instance for method chaining.
      */
     public function length(int $length, string $message = SanitizrErrorMessage::STRING_LENGTH): static
     {
@@ -25,7 +29,16 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function min(int $min, string $message = SanitizrErrorMessage::STRING_MIN_LENGTH): static
+    /**
+     * Adds a validation rule that requires the string to have at least the specified minimum length.
+     *
+     * If the string is shorter than the given minimum, a SanitizrValidationException is thrown with the provided error message.
+     *
+     * @param int $min The minimum allowed length for the string.
+     * @param string $message The error message to use if validation fails. The placeholder `%s` will be replaced with the minimum length.
+     * @return static The current schema instance for method chaining.
+     */
+    public function min(int $min, string $message = SanitizrErrorMessages::STRING_MIN_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($min, $message) {
             $inputLength = strlen($input);
@@ -38,7 +51,16 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function max(int $max, string $message = SanitizrErrorMessage::STRING_MAX_LENGTH): static
+    /**
+     * Adds a validation rule to ensure the string does not exceed the specified maximum length.
+     *
+     * Throws a SanitizrValidationException if the string's length is greater than the given maximum.
+     *
+     * @param int $max The maximum allowed length for the string.
+     * @param string $message Optional custom error message, with `%s` replaced by the maximum length.
+     * @return static
+     */
+    public function max(int $max, string $message = SanitizrErrorMessages::STRING_MAX_LENGTH): static
     {
         $this->addCheck(function (string $input) use ($max, $message) {
             $inputLength = strlen($input);
@@ -51,7 +73,17 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function between(int $min, int $max, string $message = SanitizrErrorMessage::STRING_BETWEEN_RANGE): static
+    /**
+     * Adds a validation rule that requires the string length to be within the specified inclusive range.
+     *
+     * Throws a SanitizrValidationException if the string length is less than $min or greater than $max.
+     *
+     * @param int $min The minimum allowed string length.
+     * @param int $max The maximum allowed string length.
+     * @param string $message The error message to use if validation fails. Supports sprintf placeholders for $min and $max.
+     * @return static
+     */
+    public function between(int $min, int $max, string $message = SanitizrErrorMessages::STRING_BETWEEN_RANGE): static
     {
         $this->addCheck(function (string $input) use ($min, $max, $message) {
             $inputLength = strlen($input);
@@ -64,7 +96,13 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function uppercase(string $message = SanitizrErrorMessage::STRING_ONLY_UPPERCASE): static
+    /**
+     * Adds a validation rule that requires the string to be entirely uppercase.
+     *
+     * @param string $message The error message to use if the validation fails.
+     * @return static The current schema instance for method chaining.
+     */
+    public function uppercase(string $message = SanitizrErrorMessages::STRING_ONLY_UPPERCASE): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if ($input !== strtoupper($input)) {
@@ -75,7 +113,15 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function lowercase(string $message = SanitizrErrorMessage::STRING_ONLY_LOWERCASE): static
+    /**
+     * Adds a validation rule that requires the string to be entirely lowercase.
+     *
+     * If the input string contains any uppercase characters, a SanitizrValidationException is thrown with the provided message.
+     *
+     * @param string $message Custom error message for validation failure.
+     * @return static
+     */
+    public function lowercase(string $message = SanitizrErrorMessages::STRING_ONLY_LOWERCASE): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if ($input !== strtolower($input)) {
@@ -86,7 +132,15 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function includes(string $needle, string $message = SanitizrErrorMessage::STRING_MUST_INCLUDE): static
+    /**
+     * Adds a validation rule that requires the string to contain the specified substring.
+     *
+     * @param string $needle The substring that must be present in the input string.
+     * @param string $message Optional custom error message. The substring will be injected via sprintf.
+     * @return static The current schema instance for method chaining.
+     * @throws SanitizrValidationException If the input string does not contain the specified substring.
+     */
+    public function includes(string $needle, string $message = SanitizrErrorMessages::STRING_MUST_INCLUDE): static
     {
         $this->addCheck(function (string $input) use ($needle, $message) {
             if (!str_contains($input, $needle)) {
@@ -97,7 +151,14 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function regex(string $pattern, string $message = SanitizrErrorMessage::STRING_NOT_MATCHING_REGEX): static
+    /**
+     * Adds a validation rule that requires the string to match the given regular expression pattern.
+     *
+     * @param string $pattern The regular expression pattern to match.
+     * @param string $message The error message to use if validation fails.
+     * @return static The current schema instance for method chaining.
+     */
+    public function regex(string $pattern, string $message = SanitizrErrorMessages::STRING_NOT_MATCHING_REGEX): static
     {
         $this->addCheck(function (string $input) use ($pattern, $message) {
             if (! preg_match($pattern, $input)) {
@@ -108,7 +169,15 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function email(string $message = SanitizrErrorMessage::STRING_NOT_EMAIL): static
+    /**
+     * Adds a validation rule to ensure the string is a valid email address.
+     *
+     * Throws a SanitizrValidationException with the provided message if the string does not match a valid email format.
+     *
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function email(string $message = SanitizrErrorMessages::STRING_NOT_EMAIL): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_EMAIL)) {
@@ -119,7 +188,15 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function url(string $message = SanitizrErrorMessage::STRING_NOT_URL): static
+    /**
+     * Adds a validation rule that requires the string to be a valid URL.
+     *
+     * Throws a SanitizrValidationException with the provided message if the string is not a valid URL.
+     *
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function url(string $message = SanitizrErrorMessages::STRING_NOT_URL): static
     {
         $this->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
@@ -130,7 +207,14 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function startsWith(string $prefix, string $message = SanitizrErrorMessage::STRING_MUST_START_WITH): static
+    /**
+     * Adds a validation rule that requires the string to start with the specified prefix.
+     *
+     * @param string $prefix The required starting substring.
+     * @param string $message Optional custom error message.
+     * @return static
+     */
+    public function startsWith(string $prefix, string $message = SanitizrErrorMessages::STRING_MUST_START_WITH): static
     {
         $this->addCheck(function (string $input) use ($prefix, $message) {
             if (str_starts_with($input, $prefix) === false) {
@@ -141,7 +225,16 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
-    public function endsWith(string $suffix, string $message = SanitizrErrorMessage::STRING_MUST_END_WITH): static
+    /**
+     * Adds a validation rule that requires the string to end with the specified suffix.
+     *
+     * Throws a SanitizrValidationException with a formatted message if the string does not end with the given suffix.
+     *
+     * @param string $suffix The required ending substring.
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function endsWith(string $suffix, string $message = SanitizrErrorMessages::STRING_MUST_END_WITH): static
     {
         $this->addCheck(function (string $input) use ($suffix, $message) {
             if (str_ends_with($input, $suffix) === false) {
@@ -159,6 +252,11 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to trim whitespace from both ends of the string.
+     *
+     * @return static The current schema instance for method chaining.
+     */
     public function trim(): static
     {
         $this->addTransform(function (string $input): string {
@@ -168,6 +266,11 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to convert the string to lowercase.
+     *
+     * @return static The current schema instance for method chaining.
+     */
     public function toLowerCase(): static
     {
         $this->addTransform(function (string $input): string {
@@ -177,6 +280,11 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to convert the string to uppercase.
+     *
+     * @return static The current schema instance for method chaining.
+     */
     public function toUpperCase(): static
     {
         $this->addTransform(function (string $input): string {
@@ -186,6 +294,11 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to convert the string to title case, capitalizing the first letter of each word.
+     *
+     * @return static The current schema instance for method chaining.
+     */
     public function toTitleCase(): static
     {
         $this->addTransform(function (string $input): string {
@@ -195,6 +308,12 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to remove HTML and PHP tags from the string, optionally allowing specified tags.
+     *
+     * @param string|null $allowedTags A string of tags to allow (e.g., '<b><i>'), or null to strip all tags.
+     * @return static The current schema instance for method chaining.
+     */
     public function stripTags($allowedTags = null): static
     {
         $this->addTransform(function (string $input) use ($allowedTags): string {
@@ -204,6 +323,14 @@ class SanitizrString extends AbstractSanitizrSchema
         return $this;
     }
 
+    /**
+     * Adds a transformation to convert special characters in the string to HTML entities.
+     *
+     * @param int $flags Optional flags for htmlspecialchars. Defaults to ENT_QUOTES | ENT_SUBSTITUTE.
+     * @param string|null $encoding Optional character encoding. If null, the default encoding is used.
+     * @param bool $doubleEncode Whether to convert existing HTML entities. Defaults to true.
+     * @return static The current schema instance for method chaining.
+     */
     public function htmlSpecialChars(int $flags = ENT_QUOTES | ENT_SUBSTITUTE, ?string $encoding = null, bool $doubleEncode = true): static
     {
         $this->addTransform(function (string $input) use ($doubleEncode, $encoding, $flags): string {
@@ -215,7 +342,13 @@ class SanitizrString extends AbstractSanitizrSchema
 
 
     /**
-     * @throws SanitizrValidationException
+     * Ensures the input is a string, throwing a SanitizrValidationException if not.
+     *
+     * @param mixed $input The value to validate as a string.
+     * @param string $message The error message template, with `%s` replaced by the path or 'Value'.
+     * @param string $path The path or field name for error reporting.
+     * @return string The validated string input.
+     * @throws SanitizrValidationException If the input is not a string.
      */
     protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_STRING, string $path = ''): string
     {

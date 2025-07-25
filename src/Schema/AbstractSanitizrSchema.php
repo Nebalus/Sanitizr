@@ -19,19 +19,31 @@ abstract class AbstractSanitizrSchema
     private ?array $orSchemas = [];
     private ?array $andSchemas = [];
 
+    /**
+     * Adds a transformation callable to the transformation queue for sequential application during parsing.
+     *
+     * @param callable $transform The transformation function to be applied to the parsed value.
+     */
     protected function addTransform(callable $transform): void
     {
         $this->transformQueue[] = [$transform];
     }
 
+    /**
+     * Adds a validation callable to the check queue for later execution during parsing.
+     *
+     * The callable will be invoked to validate the parsed value.
+     */
     protected function addCheck(callable $callable): void
     {
         $this->checkQueue[] = [$callable];
     }
 
-    /**
-     * Marks that the value can be optional, means the validation will not fail if the field is not present
-     * NOTE: This is only used in an object schema
+    /****
+     * Marks the schema as optional, allowing validation to succeed if the field is missing.
+     *
+     * This setting is only relevant when the schema is used as a property within an object schema.
+     *
      * @return static
      */
     public function optional(): static
@@ -41,8 +53,10 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Marks that the value is not optional, means the validation will fail if the field is not present
-     * NOTE: This is only used in an object schema
+     * Marks the schema as non-optional, requiring the field to be present during validation.
+     *
+     * This setting is only relevant when used within an object schema.
+     *
      * @return static
      */
     public function nonOptional(): static
@@ -52,8 +66,9 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Marks that the value can be null
-     * @return static
+     * Marks the schema as allowing null values.
+     *
+     * @return static The schema instance with nullability enabled.
      */
     public function nullable(): static
     {
@@ -62,8 +77,10 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Marks that the value can be NULL or OPTIONAL
-     * means the validation will not fail if the field is not present or if it is null
+     * Marks the schema as both nullable and optional.
+     *
+     * The schema will accept missing or null values without failing validation.
+     *
      * @return static
      */
     public function nullish(): static
@@ -98,8 +115,11 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Is only used, if this schema is in an object schema
-     * @return bool
+     * Returns whether the schema is marked as optional.
+     *
+     * This is relevant when the schema is used as a property within an object schema, indicating that the field may be omitted without causing validation to fail.
+     *
+     * @return bool True if the schema is optional, false otherwise.
      */
     public function isOptional(): bool
     {
@@ -107,31 +127,54 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * @return bool
+     * Determines whether the schema allows null values.
+     *
+     * @return bool True if the schema is nullable; otherwise, false.
      */
     public function isNullable(): bool
     {
         return $this->isNullable;
     }
 
+    /**
+     * Determines if the schema is both nullable and optional.
+     *
+     * @return bool True if the schema allows null values and is optional.
+     */
     public function isNullish()
     {
         return $this->isNullable && $this->isOptional();
     }
 
+    /**
+     * Determines whether a default value is set for the schema.
+     *
+     * @return bool True if a default value is defined; otherwise, false.
+     */
     public function hasDefaultValue(): bool
     {
         return $this->hasDefaultValue;
     }
 
+    /**
+     * Returns the default value set for the schema, if any.
+     *
+     * @return mixed The default value, or null if no default is set.
+     */
     public function getDefaultValue(): mixed
     {
         return $this->defaultValue;
     }
 
     /**
-     * Parse the input value
-     * @throws SanitizrValidationException
+     * Parses and validates the input value according to the schema, applying transformations and checks.
+     *
+     * If the schema is nullable and the input is null, returns null. If a default value is set and the input is null, returns the default value. Otherwise, parses the input, applies all registered transformations and validation checks, and enforces all "and" schemas. If validation fails and "or" schemas are defined, attempts to parse the input with each "or" schema until one succeeds. Throws a SanitizrValidationException if no schema validates the input.
+     *
+     * @param mixed $input The value to be parsed and validated.
+     * @param string $path The path to the value, used for error reporting.
+     * @return mixed The parsed and validated value, or null/default if applicable.
+     * @throws SanitizrValidationException If the input does not satisfy any schema.
      */
     public function parse(mixed $input, string $path = ''): mixed
     {

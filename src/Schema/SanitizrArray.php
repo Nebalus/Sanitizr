@@ -6,6 +6,11 @@ use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrArray extends AbstractSanitizrSchema
 {
+    /**
+     * Initializes the SanitizrArray with a schema for validating each array element.
+     *
+     * @param AbstractSanitizrSchema $schema The schema used to validate and parse each element of the array.
+     */
     public function __construct(
         private readonly AbstractSanitizrSchema $schema
     ) {
