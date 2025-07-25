@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace UnitTesting\Schema;
 
 use PHPUnit\Framework\TestCase;
 
-class SanitizrStringSchemaTest extends TestCase
+class SanitizrArrayTest extends TestCase
 {
 }
