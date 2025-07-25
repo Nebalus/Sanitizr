@@ -1,12 +1,15 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema\Primitives;
+namespace Nebalus\Sanitizr\Schema\Primitive;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Trait\SchemaStringableTrait;
 
 class SanitizrNumber extends AbstractSanitizrSchema
 {
+    use SchemaStringableTrait;
+
     public function gt(int|float $value, string $message = 'Must be greater than %s'): static
     {
         $this->addCheck(function (int|float $input) use ($value, $message) {
@@ -133,6 +136,10 @@ class SanitizrNumber extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $message = '%s must be NUMERIC', string $path = ''): int
     {
+        if ($this->isStringable) { // TODO Check if an the Number is a float or an integer
+            $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_NULL_ON_FAILURE);
+        }
+
         if (! is_numeric($input)) {
             throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
         }

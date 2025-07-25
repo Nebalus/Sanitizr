@@ -1,11 +1,13 @@
-dockerComposeTest := "docker compose -f docker-compose.phpunit.yml"
+dockerComposeTest := "docker compose -f docker-compose.phpcli.yml"
 
 test:
-    {{dockerComposeTest}} build && {{dockerComposeTest}} run php-fpm /var/www/vendor/bin/phpunit -c /var/www/phpunit.xml
+    {{ dockerComposeTest }} build
+    {{ dockerComposeTest }} run php-cli /var/www/vendor/bin/phpunit -c /var/www/phpunit.xml
 
 lint:
-    {{dockerComposeTest}} run php-fpm /var/www/vendor/bin/phpmd /var/www/src text /var/www/phpmd.xml
-    {{dockerComposeTest}} run php-fpm /var/www/vendor/bin/phpcs --standard=/var/www/phpcs.xml /var/www/src
+    {{ dockerComposeTest }} build
+    {{ dockerComposeTest }} run php-cli /var/www/vendor/bin/phpmd /var/www/src text /var/www/phpmd.xml
+    {{ dockerComposeTest }} run php-cli /var/www/vendor/bin/phpcs --standard=/var/www/phpcs.xml /var/www/src
 
 build:
-    {{dockerComposeTest}} build
+    {{ dockerComposeTest }} build
