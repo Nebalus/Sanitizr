@@ -1,10 +1,10 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/Nebalus/Sanitizr"><img src="imgs/logo.jpg?raw=true" alt="Sanitzr" width="70%"></a>
+  <a href="https://github.com/Nebalus/Sanitizr"><img src="imgs/logo.jpg?raw=true" alt="Sanitizr" width="70%"></a>
   <br>
 </h1>
 
-<h4 align="center">A <a href="https://zod.dev" target="_blank">Zod</a> inspired Validation and Filter Framework written in PHP.</h4>
+<h4 align="center">A <a href="https://zod.dev">Zod</a> inspired Validation and Filter Framework written in PHP.</h4>
 
 <p align="center">
   <a href="#key-features">Key Features</a> •
