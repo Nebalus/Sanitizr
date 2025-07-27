@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-07-27
+### Changed
+- README.md
+
+[1.0.1]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.0...v1.0.1
+
 
 ## [1.0.0] - 2025-07-25
 ### Added 
