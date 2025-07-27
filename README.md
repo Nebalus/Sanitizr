@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/Nebalus/Sanitizr"><img src="https://raw.githubusercontent.com/Nebalus/Sanitizr/tree/dev/imgs/logo.jpg" alt="Sanitzr" width="200"></a>
+  <a href="https://github.com/Nebalus/Sanitizr"><img src="https://github.com/Nebalus/Sanitizr/blob/dev/imgs/logo.jpg?raw=true" alt="Sanitzr" width="200"></a>
   <br>
   Sanitizr
   <br>
