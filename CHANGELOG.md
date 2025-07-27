@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README.md
 
-[1.0.1]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.0...v1.0.1
+[1.0.1]: https://github.com/Nebalus/Sanitizr/compare/tag/v1.0.0...v1.0.1
 
 
 ## [1.0.0] - 2025-07-25
