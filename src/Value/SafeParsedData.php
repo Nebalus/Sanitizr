@@ -5,23 +5,28 @@ namespace Nebalus\Sanitizr\Value;
 readonly class SafeParsedData
 {
     private function __construct(
-        private bool $success,
+        private bool $valid,
         private mixed $value,
         private string|null $error
     ) {
     }
 
-    public static function from(bool $success, mixed $value, string|null $error): self
+    public static function from(bool $valid, mixed $value, string|null $error): self
     {
-        return new self($success, $value, $error);
+        return new self($valid, $value, $error);
     }
 
     /**
-     * @return bool
+     * @deprecated [v1.0.1] [Use isValid() instead]
      */
     public function isSuccess(): bool
     {
-        return $this->success;
+        return $this->isValid();
+    }
+
+    public function isValid(): bool
+    {
+        return $this->valid;
     }
 
     /**
