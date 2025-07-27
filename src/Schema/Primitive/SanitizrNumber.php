@@ -20,101 +20,110 @@ class SanitizrNumber extends AbstractSanitizrSchema
      */
     public function gt(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_GREATER_THAN): static
     {
-        $this->addCheck(function (int|float $input) use ($value, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($value, $message) {
             if ($input < $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function gte(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_GREATER_THAN_OR_EQUAL): static
     {
-        $this->addCheck(function (int|float $input) use ($value, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($value, $message) {
             if ($input <= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function lt(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_LESS_THAN): static
     {
-        $this->addCheck(function (int|float $input) use ($value, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($value, $message) {
             if ($input > $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function lte(int|float $value, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_LESS_THAN_OR_EQUAL): static
     {
-        $this->addCheck(function (int|float $input) use ($value, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($value, $message) {
             if ($input >= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function float(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_FLOAT): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if (! is_float($input)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function integer(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_INTEGER): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if (! is_int($input)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function positive(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_POSITIVE): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if ($input <= 0) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function nonPositive(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NONPOSITIVE): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if ($input > 0) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function negative(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NEGATIVE): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if ($input >= 0) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -125,13 +134,14 @@ class SanitizrNumber extends AbstractSanitizrSchema
      */
     public function nonNegative(string $message = SanitizrErrorMessage::NUMBER_MUST_BE_NONNEGATIVE): static
     {
-        $this->addCheck(function (int|float $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($message) {
             if ($input < 0) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -142,13 +152,14 @@ class SanitizrNumber extends AbstractSanitizrSchema
      */
     public function multipleOf(int|float $multiple, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_MULTIPLE_OF): static
     {
-        $this->addCheck(function (int|float $input) use ($multiple, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (int|float $input) use ($multiple, $message) {
             if ($input % $multiple != 0) {
                 throw new SanitizrValidationException(sprintf($message, $multiple));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**

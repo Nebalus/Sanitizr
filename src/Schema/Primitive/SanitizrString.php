@@ -18,7 +18,8 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function length(int $length, string $message = SanitizrErrorMessage::STRING_LENGTH): static
     {
-        $this->addCheck(function (string $input) use ($length, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($length, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength !== $length) {
@@ -26,7 +27,7 @@ class SanitizrString extends AbstractSanitizrSchema
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -40,7 +41,8 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function min(int $min, string $message = SanitizrErrorMessages::STRING_MIN_LENGTH): static
     {
-        $this->addCheck(function (string $input) use ($min, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($min, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength < $min) {
@@ -48,7 +50,7 @@ class SanitizrString extends AbstractSanitizrSchema
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -62,7 +64,8 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function max(int $max, string $message = SanitizrErrorMessages::STRING_MAX_LENGTH): static
     {
-        $this->addCheck(function (string $input) use ($max, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($max, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength > $max) {
@@ -70,7 +73,7 @@ class SanitizrString extends AbstractSanitizrSchema
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -85,7 +88,8 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function between(int $min, int $max, string $message = SanitizrErrorMessages::STRING_BETWEEN_RANGE): static
     {
-        $this->addCheck(function (string $input) use ($min, $max, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($min, $max, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength < $min || $inputLength > $max) {
@@ -93,7 +97,7 @@ class SanitizrString extends AbstractSanitizrSchema
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -104,13 +108,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function uppercase(string $message = SanitizrErrorMessages::STRING_ONLY_UPPERCASE): static
     {
-        $this->addCheck(function (string $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
             if ($input !== strtoupper($input)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -123,13 +128,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function lowercase(string $message = SanitizrErrorMessages::STRING_ONLY_LOWERCASE): static
     {
-        $this->addCheck(function (string $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
             if ($input !== strtolower($input)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -142,13 +148,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function includes(string $needle, string $message = SanitizrErrorMessages::STRING_MUST_INCLUDE): static
     {
-        $this->addCheck(function (string $input) use ($needle, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($needle, $message) {
             if (!str_contains($input, $needle)) {
                 throw new SanitizrValidationException(sprintf($message, $needle));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -160,13 +167,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function regex(string $pattern, string $message = SanitizrErrorMessages::STRING_NOT_MATCHING_REGEX): static
     {
-        $this->addCheck(function (string $input) use ($pattern, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($pattern, $message) {
             if (! preg_match($pattern, $input)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -179,13 +187,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function email(string $message = SanitizrErrorMessages::STRING_NOT_EMAIL): static
     {
-        $this->addCheck(function (string $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_EMAIL)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -198,13 +207,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function url(string $message = SanitizrErrorMessages::STRING_NOT_URL): static
     {
-        $this->addCheck(function (string $input) use ($message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
                 throw new SanitizrValidationException($message);
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -216,13 +226,14 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function startsWith(string $prefix, string $message = SanitizrErrorMessages::STRING_MUST_START_WITH): static
     {
-        $this->addCheck(function (string $input) use ($prefix, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($prefix, $message) {
             if (str_starts_with($input, $prefix) === false) {
                 throw new SanitizrValidationException(sprintf($message, $prefix));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -236,20 +247,22 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function endsWith(string $suffix, string $message = SanitizrErrorMessages::STRING_MUST_END_WITH): static
     {
-        $this->addCheck(function (string $input) use ($suffix, $message) {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($suffix, $message) {
             if (str_ends_with($input, $suffix) === false) {
                 throw new SanitizrValidationException(sprintf($message, $suffix));
             }
         });
 
-        return $this;
+        return $newSchema;
     }
 
     public function transform(callable $transformer): static
     {
-        $this->addTransform($transformer);
+        $newSchema = clone $this;
+        $newSchema->addTransform($transformer);
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -259,11 +272,12 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function trim(): static
     {
-        $this->addTransform(function (string $input): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input): string {
             return trim($input);
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -273,11 +287,12 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function toLowerCase(): static
     {
-        $this->addTransform(function (string $input): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input): string {
             return strtolower($input);
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -287,11 +302,12 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function toUpperCase(): static
     {
-        $this->addTransform(function (string $input): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input): string {
             return strtoupper($input);
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -301,11 +317,12 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     public function toTitleCase(): static
     {
-        $this->addTransform(function (string $input): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input): string {
             return ucwords(strtolower($input));
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -313,14 +330,18 @@ class SanitizrString extends AbstractSanitizrSchema
      *
      * @param string|null $allowedTags A string of tags to allow (e.g., '<b><i>'), or null to strip all tags.
      * @return static The current schema instance for method chaining.
+     * @deprecated [v1.0.1] [Use `strip_tags` instead of `stripTags` for consistency with PHP's built-in function.]
+     * @see strip_tags()
+     * @see https://www.php.net/manual/en/function.strip-tags.php
      */
     public function stripTags($allowedTags = null): static
     {
-        $this->addTransform(function (string $input) use ($allowedTags): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input) use ($allowedTags): string {
             return strip_tags($input, $allowedTags);
         });
 
-        return $this;
+        return $newSchema;
     }
 
     /**
@@ -330,14 +351,18 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string|null $encoding Optional character encoding. If null, the default encoding is used.
      * @param bool $doubleEncode Whether to convert existing HTML entities. Defaults to true.
      * @return static The current schema instance for method chaining.
+     * @deprecated [v1.0.1] [Use `htmlspecialchars` instead of `htmlSpecialChars` for consistency with PHP's built-in function.]
+     * @see htmlspecialchars()
+     * @see https://www.php.net/manual/en/function.htmlspecialchars.php
      */
     public function htmlSpecialChars(int $flags = ENT_QUOTES | ENT_SUBSTITUTE, ?string $encoding = null, bool $doubleEncode = true): static
     {
-        $this->addTransform(function (string $input) use ($doubleEncode, $encoding, $flags): string {
+        $newSchema = clone $this;
+        $newSchema->addTransform(function (string $input) use ($doubleEncode, $encoding, $flags): string {
             return htmlspecialchars($input, $flags, $encoding, $doubleEncode);
         });
 
-        return $this;
+        return $newSchema;
     }
 
 

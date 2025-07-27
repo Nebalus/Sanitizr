@@ -39,7 +39,7 @@ abstract class AbstractSanitizrSchema
         $this->checkQueue[] = [$callable];
     }
 
-    /****
+    /**
      * Marks the schema as optional, allowing validation to succeed if the field is missing.
      *
      * This setting is only relevant when the schema is used as a property within an object schema.
@@ -48,8 +48,9 @@ abstract class AbstractSanitizrSchema
      */
     public function optional(): static
     {
-        $this->isOptional = true;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isOptional = true;
+        return $newSchema;
     }
 
     /**
@@ -61,8 +62,9 @@ abstract class AbstractSanitizrSchema
      */
     public function nonOptional(): static
     {
-        $this->isOptional = false;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isOptional = false;
+        return $newSchema;
     }
 
     /**
@@ -72,8 +74,9 @@ abstract class AbstractSanitizrSchema
      */
     public function nullable(): static
     {
-        $this->isNullable = true;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isNullable = true;
+        return $newSchema;
     }
 
     /**
@@ -85,9 +88,10 @@ abstract class AbstractSanitizrSchema
      */
     public function nullish(): static
     {
-        $this->isNullable = true;
-        $this->isOptional = true;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isNullable = true;
+        $newSchema->isOptional = true;
+        return $newSchema;
     }
 
     /**
@@ -97,21 +101,24 @@ abstract class AbstractSanitizrSchema
      */
     public function default(mixed $value): static
     {
-        $this->hasDefaultValue = true;
-        $this->defaultValue = $value;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->hasDefaultValue = true;
+        $newSchema->defaultValue = $value;
+        return $newSchema;
     }
 
     public function or(AbstractSanitizrSchema $orSanitizerSchema): static
     {
-        $this->orSchemas[] = $orSanitizerSchema;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->orSchemas[] = $orSanitizerSchema;
+        return $newSchema;
     }
 
     public function and(AbstractSanitizrSchema $andSanitizerSchema): static
     {
-        $this->andSchemas[] = $andSanitizerSchema;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->andSchemas[] = $andSanitizerSchema;
+        return $newSchema;
     }
 
     /**
