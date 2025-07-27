@@ -49,7 +49,7 @@ $input = [
 
 $result = $userSchema->safeParse($input);
 
-if ($result->isSuccess()) {
+if ($result->isValid()) {
     $user = $result->getValue();
     // Use sanitized data
     echo $user["name"]; // Outputs: Alex
