@@ -1,9 +1,8 @@
 <?php
 
-namespace Nebalus\Sanitizr\Schema\Primitive;
+namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
-use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
 
 class SanitizrNull extends AbstractSanitizrSchema
