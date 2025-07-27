@@ -34,7 +34,7 @@ readonly class SafeParsedData
      */
     public function isError(): bool
     {
-        return $this->success === false;
+        return $this->valid === false;
     }
 
     /**
