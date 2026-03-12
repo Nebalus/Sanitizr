@@ -318,13 +318,6 @@ class SanitizrString extends AbstractSanitizrSchema
         return $newSchema;
     }
 
-    public function transform(callable $transformer): static
-    {
-        $newSchema = clone $this;
-        $newSchema->addTransform($transformer);
-
-        return $newSchema;
-    }
 
     /**
      * Adds a transformation to trim whitespace from both ends of the string.

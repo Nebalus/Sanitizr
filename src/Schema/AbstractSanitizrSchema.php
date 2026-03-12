@@ -9,6 +9,7 @@ abstract class AbstractSanitizrSchema
 {
     private array $transformQueue = [];
     private array $checkQueue = [];
+    private array $postTransformQueue = [];
 
     private bool $isOptional = false;
     private bool $isNullable = false;
@@ -122,6 +123,20 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Maps the parsed value using the given transformation function.
+     * The transform is executed after all validation checks have passed.
+     *
+     * @param callable $transformer The function transforming the parsed data.
+     * @return static
+     */
+    public function transform(callable $transformer): static
+    {
+        $newSchema = clone $this;
+        $newSchema->postTransformQueue[] = [$transformer];
+        return $newSchema;
+    }
+
+    /**
      * Returns whether the schema is marked as optional.
      *
      * This is relevant when the schema is used as a property within an object schema, indicating that the field may be omitted without causing validation to fail.
@@ -213,6 +228,10 @@ abstract class AbstractSanitizrSchema
                 foreach ($this->andSchemas as $andSchema) {
                     $andSchema->parse($parsedValue, path: $path);
                 }
+            }
+
+            foreach ($this->postTransformQueue as $value) {
+                $parsedValue = $value[0]($parsedValue);
             }
 
             return $parsedValue;
