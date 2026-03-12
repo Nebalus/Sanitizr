@@ -7,7 +7,7 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrBatch;
+use Nebalus\Sanitizr\Schema\SanitizrTuple;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
@@ -46,6 +46,28 @@ class Sanitizr
     }
 
     /**
+     * Creates a schema for validating float values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public function float(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->float();
+    }
+
+    /**
+     * Creates a schema for validating integer values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public function integer(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->integer();
+    }
+
+    /**
      * Creates a schema for validating and sanitizing string values.
      *
      * @return SanitizrString The string schema instance.
@@ -78,14 +100,14 @@ class Sanitizr
     }
 
     /**
-     * Creates a batch schema that applies multiple schemas in sequence.
+     * Creates a tuple schema that applies multiple schemas in sequence.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schemas to be applied in batch.
-     * @return SanitizrBatch The batch schema instance.
+     * @param AbstractSanitizrSchema ...$schemas One or more schemas to be applied in tuple.
+     * @return SanitizrTuple The tuple schema instance.
      */
-    public function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatch
+    public function tuple(AbstractSanitizrSchema ...$schemas): SanitizrTuple
     {
-        return new SanitizrBatch(...$schemas);
+        return new SanitizrTuple(...$schemas);
     }
 
     /**
@@ -146,17 +168,5 @@ class Sanitizr
     {
         $clonedSchema = clone $schema;
         return $clonedSchema->nonOptional();
-    }
-
-    public function float(): SanitizrNumber
-    {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->float();
-    }
-
-    public function integer(): SanitizrNumber
-    {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->integer();
     }
 }
