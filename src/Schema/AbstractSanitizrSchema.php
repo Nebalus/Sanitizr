@@ -176,7 +176,12 @@ abstract class AbstractSanitizrSchema
     /**
      * Parses and validates the input value according to the schema, applying transformations and checks.
      *
-     * If the schema is nullable and the input is null, returns null. If a default value is set and the input is null, returns the default value. Otherwise, parses the input, applies all registered transformations and validation checks, and enforces all "and" schemas. If validation fails and "or" schemas are defined, attempts to parse the input with each "or" schema until one succeeds. Throws a SanitizrValidationException if no schema validates the input.
+     * If the schema is nullable and the input is null, returns null.
+     * If a default value is set and the input is null, returns the default value.
+     * Otherwise, parses the input, applies all registered transformations and validation checks,
+     * and enforces all "and" schemas. If validation fails and "or" schemas are defined,
+     * attempts to parse the input with each "or" schema until one succeeds.
+     * Throws a SanitizrValidationException if no schema validates the input.
      *
      * @param mixed $input The value to be parsed and validated.
      * @param string $path The path to the value, used for error reporting.
@@ -243,5 +248,5 @@ abstract class AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    abstract protected function parseValue(mixed $input, string $message, string $path = ''): mixed;
+    abstract protected function parseValue(mixed $input, string $message = '', string $path = ''): mixed;
 }

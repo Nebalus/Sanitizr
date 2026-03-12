@@ -7,9 +7,9 @@ trait SchemaStringableTrait
     private bool $isStringable = false;
 
     /**
-     * Determines whether the current Schemainstance is can accept other data types
+     * Determines whether the current schema instance can accept other data types.
      *
-     * @return bool True if the instance can accept other datatypes than its own; otherwise, false.
+     * @return bool True if the instance can accept other datatypes to be converted into its own; otherwise, false.
      */
     public function isStringable(): bool
     {
@@ -17,13 +17,14 @@ trait SchemaStringableTrait
     }
 
     /**
-     * Marks the current Schemainstance is able to accept other data types and trys to convert in into the schemasy desired datatype
+     * Marks the current schema instance as able to accept other data types, and tries to convert them into the schema's desired datatype.
      *
-     * @return static and it will accept other datatypes when the schema is parsed
+     * @return static Returns a new schema instance that accepts other datatypes.
      */
     public function stringable(): static
     {
-        $this->isStringable = true;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isStringable = true;
+        return $newSchema;
     }
 }

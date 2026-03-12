@@ -5,7 +5,6 @@ namespace Nebalus\Sanitizr\Schema\Primitive;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
-use Nebalus\Sanitizr\Types\SanitizrErrorMessages;
 
 class SanitizrString extends AbstractSanitizrSchema
 {
@@ -39,7 +38,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails. The placeholder `%s` will be replaced with the minimum length.
      * @return static The current schema instance for method chaining.
      */
-    public function min(int $min, string $message = SanitizrErrorMessages::STRING_MIN_LENGTH): static
+    public function min(int $min, string $message = SanitizrErrorMessage::STRING_MIN_LENGTH): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($min, $message) {
@@ -62,7 +61,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message Optional custom error message, with `%s` replaced by the maximum length.
      * @return static
      */
-    public function max(int $max, string $message = SanitizrErrorMessages::STRING_MAX_LENGTH): static
+    public function max(int $max, string $message = SanitizrErrorMessage::STRING_MAX_LENGTH): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($max, $message) {
@@ -86,7 +85,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails. Supports sprintf placeholders for $min and $max.
      * @return static
      */
-    public function between(int $min, int $max, string $message = SanitizrErrorMessages::STRING_BETWEEN_RANGE): static
+    public function between(int $min, int $max, string $message = SanitizrErrorMessage::STRING_BETWEEN_RANGE): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($min, $max, $message) {
@@ -106,7 +105,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if the validation fails.
      * @return static The current schema instance for method chaining.
      */
-    public function uppercase(string $message = SanitizrErrorMessages::STRING_ONLY_UPPERCASE): static
+    public function uppercase(string $message = SanitizrErrorMessage::STRING_ONLY_UPPERCASE): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($message) {
@@ -126,7 +125,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message Custom error message for validation failure.
      * @return static
      */
-    public function lowercase(string $message = SanitizrErrorMessages::STRING_ONLY_LOWERCASE): static
+    public function lowercase(string $message = SanitizrErrorMessage::STRING_ONLY_LOWERCASE): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($message) {
@@ -146,7 +145,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @return static The current schema instance for method chaining.
      * @throws SanitizrValidationException If the input string does not contain the specified substring.
      */
-    public function includes(string $needle, string $message = SanitizrErrorMessages::STRING_MUST_INCLUDE): static
+    public function includes(string $needle, string $message = SanitizrErrorMessage::STRING_MUST_INCLUDE): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($needle, $message) {
@@ -165,7 +164,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails.
      * @return static The current schema instance for method chaining.
      */
-    public function regex(string $pattern, string $message = SanitizrErrorMessages::STRING_NOT_MATCHING_REGEX): static
+    public function regex(string $pattern, string $message = SanitizrErrorMessage::STRING_NOT_MATCHING_REGEX): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($pattern, $message) {
@@ -185,7 +184,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails.
      * @return static
      */
-    public function email(string $message = SanitizrErrorMessages::STRING_NOT_EMAIL): static
+    public function email(string $message = SanitizrErrorMessage::STRING_NOT_EMAIL): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($message) {
@@ -205,7 +204,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails.
      * @return static
      */
-    public function url(string $message = SanitizrErrorMessages::STRING_NOT_URL): static
+    public function url(string $message = SanitizrErrorMessage::STRING_NOT_URL): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($message) {
@@ -224,7 +223,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message Optional custom error message.
      * @return static
      */
-    public function startsWith(string $prefix, string $message = SanitizrErrorMessages::STRING_MUST_START_WITH): static
+    public function startsWith(string $prefix, string $message = SanitizrErrorMessage::STRING_MUST_START_WITH): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($prefix, $message) {
@@ -245,7 +244,7 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $message The error message to use if validation fails.
      * @return static
      */
-    public function endsWith(string $suffix, string $message = SanitizrErrorMessages::STRING_MUST_END_WITH): static
+    public function endsWith(string $suffix, string $message = SanitizrErrorMessage::STRING_MUST_END_WITH): static
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($suffix, $message) {
