@@ -224,7 +224,7 @@ $inputData = json_decode($jsonPayload, true);
 // Parse and validate the structure
 try {
     $requestDto = SendRequest::fromArray($inputData);
-    
+
     echo "Payload is VALID and hydrated to Objects!\n\nParsed Data:\n";
     print_r($requestDto);
 } catch (Exception $e) {
