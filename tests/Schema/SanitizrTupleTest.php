@@ -6,7 +6,6 @@ namespace UnitTesting\Schema;
 
 use PHPUnit\Framework\TestCase;
 
-class SanitizrBatchTest extends TestCase
+class SanitizrTupleTest extends TestCase
 {
-
 }

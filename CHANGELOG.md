@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-12
+### Added
+- Discriminated union schemas for type-based conditional validation.
+- Phone, alphanumeric, and digit string validators.
+- Post-validation transformation support.
+- Separate float and integer numeric types with stringable support.
+- Five comprehensive example files demonstrating validation use cases including nested objects, transformations, and complex payloads.
+- Updated metadata and project configuration.
+
+### Improved
+- Enhanced numeric constraint semantics for greater clarity.
+- Tuple schema (improved naming from batch).
+
+[1.1.0]: https://github.com/Nebalus/Sanitizr/compare/v1.0.2...v1.1.0
+
+
 ## [1.0.2] - 2025-07-27
 ### Changed
 - In `SafeParsedData`, the property `success` is renamed to `valid`. The method `isSuccess()` is now deprecated in favor of `isValid()`, and all logic now checks `valid` instead of `success`.
@@ -15,14 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deprecated methods such as `stripTags` and `htmlSpecialChars` in `SanitizrString` are annotated as such, with references to their recommended replacements.
 - Minor docblock and formatting improvements.
 
-[1.0.2]: https://github.com/Nebalus/Sanitizr/releases/tag/v1.0.1...v1.0.2
+[1.0.2]: https://github.com/Nebalus/Sanitizr/compare/v1.0.1...v1.0.2
 
 
 ## [1.0.1] - 2025-07-27
 ### Changed
 - README.md
 
-[1.0.1]: https://github.com/Nebalus/Sanitizr/compare/tag/v1.0.0...v1.0.1
+[1.0.1]: https://github.com/Nebalus/Sanitizr/compare/v1.0.0...v1.0.1
 
 
 ## [1.0.0] - 2025-07-25

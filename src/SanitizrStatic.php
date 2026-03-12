@@ -7,10 +7,11 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrBatch;
+use Nebalus\Sanitizr\Schema\SanitizrTuple;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
+use Nebalus\Sanitizr\Schema\SanitizrDiscriminatedUnion;
 
 class SanitizrStatic
 {
@@ -46,6 +47,28 @@ class SanitizrStatic
     }
 
     /**
+     * Creates a schema for validating float values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public static function float(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->float();
+    }
+
+    /**
+     * Creates a schema for validating integer values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public static function integer(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->integer();
+    }
+
+    /**
      * Creates a schema for validating string values.
      *
      * @return SanitizrString A new string schema instance.
@@ -78,14 +101,17 @@ class SanitizrStatic
     }
 
     /**
-     * Creates a batch schema that aggregates multiple schemas.
+     * Creates a tuple schema that aggregates multiple schemas mapped to an array's indices.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schemas to include in the batch.
-     * @return SanitizrBatch The batch schema instance containing the provided schemas.
+     * A Tuple is a data structure used to describe an array with a fixed length
+     * where each specific position (index) has a specific type.
+     *
+     * @param AbstractSanitizrSchema ...$schemas One or more schemas to apply mapped directly to their positional index.
+     * @return SanitizrTuple The tuple schema instance containing the provided schemas.
      */
-    public static function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatch
+    public static function tuple(AbstractSanitizrSchema ...$schemas): SanitizrTuple
     {
-        return new SanitizrBatch(...$schemas);
+        return new SanitizrTuple(...$schemas);
     }
 
     /**
@@ -148,15 +174,15 @@ class SanitizrStatic
         return $clonedSchema->nonOptional();
     }
 
-    public static function float(): SanitizrNumber
+    /**
+     * Creates a discriminated union schema that routes validation to a specific object schema based on a discriminator key.
+     *
+     * @param string $discriminator The key in the input array/object to use for discriminating the schema.
+     * @param SanitizrObject ...$schemas The schemas to include in the union. Each must have a SanitizrLiteral schema at the discriminator key.
+     * @return SanitizrDiscriminatedUnion The discriminated union schema.
+     */
+    public static function discriminatedUnion(string $discriminator, SanitizrObject ...$schemas): SanitizrDiscriminatedUnion
     {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->float();
-    }
-
-    public static function integer(): SanitizrNumber
-    {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->integer();
+        return new SanitizrDiscriminatedUnion($discriminator, ...$schemas);
     }
 }

@@ -22,7 +22,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (int|float $input) use ($value, $message) {
-            if ($input < $value) {
+            if ($input <= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
@@ -34,7 +34,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (int|float $input) use ($value, $message) {
-            if ($input <= $value) {
+            if ($input < $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
@@ -46,7 +46,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (int|float $input) use ($value, $message) {
-            if ($input > $value) {
+            if ($input >= $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
@@ -58,7 +58,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (int|float $input) use ($value, $message) {
-            if ($input >= $value) {
+            if ($input > $value) {
                 throw new SanitizrValidationException(sprintf($message, $value));
             }
         });
@@ -145,9 +145,10 @@ class SanitizrNumber extends AbstractSanitizrSchema
     }
 
     /**
-     * Adds a validation rule that requires the input to be greater than or equal to zero.
+     * Adds a validation rule that requires the input to be a multiple of the specified value.
      *
-     * @param string $message Custom error message if the input is negative.
+     * @param int|float $multiple The value that the input must be a multiple of.
+     * @param string $message Custom error message if the input is not a multiple.
      * @return static
      */
     public function multipleOf(int|float $multiple, string $message = SanitizrErrorMessage::NUMBER_MUST_BE_MULTIPLE_OF): static
@@ -173,10 +174,10 @@ class SanitizrNumber extends AbstractSanitizrSchema
      * @return int|float The validated numeric value.
      * @throws SanitizrValidationException If the input is not numeric.
      */
-    protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_NUMERIC, string $path = ''): int
+    protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_NUMERIC, string $path = ''): int|float
     {
         if ($this->isStringable) { // TODO Check if an the Number is a float or an integer
-            $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_NULL_ON_FAILURE);
+            $input = filter_var($input, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_NULL_ON_FAILURE);
         }
 
         if (! is_numeric($input)) {

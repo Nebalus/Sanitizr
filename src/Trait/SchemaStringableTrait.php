@@ -7,9 +7,9 @@ trait SchemaStringableTrait
     private bool $isStringable = false;
 
     /**
-     * Determines whether the current instance is marked as stringable.
+     * Determines whether the current schema instance can accept other data types.
      *
-     * @return bool True if the instance is stringable; otherwise, false.
+     * @return bool True if the instance can accept other datatypes to be converted into its own; otherwise, false.
      */
     public function isStringable(): bool
     {
@@ -17,13 +17,14 @@ trait SchemaStringableTrait
     }
 
     /**
-     * Marks the instance as stringable and enables method chaining.
+     * Marks the current schema instance as able to accept other data types, and tries to convert them into the schema's desired datatype.
      *
-     * @return static The current instance with stringable state set to true.
+     * @return static Returns a new schema instance that accepts other datatypes.
      */
     public function stringable(): static
     {
-        $this->isStringable = true;
-        return $this;
+        $newSchema = clone $this;
+        $newSchema->isStringable = true;
+        return $newSchema;
     }
 }

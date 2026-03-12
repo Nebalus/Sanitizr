@@ -9,6 +9,7 @@ abstract class AbstractSanitizrSchema
 {
     private array $transformQueue = [];
     private array $checkQueue = [];
+    private array $postTransformQueue = [];
 
     private bool $isOptional = false;
     private bool $isNullable = false;
@@ -122,6 +123,20 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Maps the parsed value using the given transformation function.
+     * The transform is executed after all validation checks have passed.
+     *
+     * @param callable $transformer The function transforming the parsed data.
+     * @return static
+     */
+    public function transform(callable $transformer): static
+    {
+        $newSchema = clone $this;
+        $newSchema->postTransformQueue[] = [$transformer];
+        return $newSchema;
+    }
+
+    /**
      * Returns whether the schema is marked as optional.
      *
      * This is relevant when the schema is used as a property within an object schema, indicating that the field may be omitted without causing validation to fail.
@@ -176,7 +191,12 @@ abstract class AbstractSanitizrSchema
     /**
      * Parses and validates the input value according to the schema, applying transformations and checks.
      *
-     * If the schema is nullable and the input is null, returns null. If a default value is set and the input is null, returns the default value. Otherwise, parses the input, applies all registered transformations and validation checks, and enforces all "and" schemas. If validation fails and "or" schemas are defined, attempts to parse the input with each "or" schema until one succeeds. Throws a SanitizrValidationException if no schema validates the input.
+     * If the schema is nullable and the input is null, returns null.
+     * If a default value is set and the input is null, returns the default value.
+     * Otherwise, parses the input, applies all registered transformations and validation checks,
+     * and enforces all "and" schemas. If validation fails and "or" schemas are defined,
+     * attempts to parse the input with each "or" schema until one succeeds.
+     * Throws a SanitizrValidationException if no schema validates the input.
      *
      * @param mixed $input The value to be parsed and validated.
      * @param string $path The path to the value, used for error reporting.
@@ -208,6 +228,10 @@ abstract class AbstractSanitizrSchema
                 foreach ($this->andSchemas as $andSchema) {
                     $andSchema->parse($parsedValue, path: $path);
                 }
+            }
+
+            foreach ($this->postTransformQueue as $value) {
+                $parsedValue = $value[0]($parsedValue);
             }
 
             return $parsedValue;
@@ -243,5 +267,5 @@ abstract class AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    abstract protected function parseValue(mixed $input, string $message, string $path = ''): mixed;
+    abstract protected function parseValue(mixed $input, string $message = '', string $path = ''): mixed;
 }
