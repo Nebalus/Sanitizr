@@ -4,13 +4,13 @@ namespace Nebalus\Sanitizr\Schema;
 
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
-class SanitizrBatch extends AbstractSanitizrSchema
+class SanitizrTuple extends AbstractSanitizrSchema
 {
     private array $schemas;
     /**
-     * Initializes the batch schema with one or more schema objects.
+     * Initializes the tuple schema with one or more schema objects.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schema instances to include in the batch.
+     * @param AbstractSanitizrSchema ...$schemas One or more schema instances to include in the tuple.
      */
     public function __construct(
         AbstractSanitizrSchema ...$schemas

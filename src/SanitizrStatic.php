@@ -7,7 +7,7 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrBatch;
+use Nebalus\Sanitizr\Schema\SanitizrTuple;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
@@ -46,6 +46,28 @@ class SanitizrStatic
     }
 
     /**
+     * Creates a schema for validating float values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public static function float(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->float();
+    }
+
+    /**
+     * Creates a schema for validating integer values.
+     *
+     * @return SanitizrNumber A schema instance representing a number.
+     */
+    public static function integer(): SanitizrNumber
+    {
+        $numberSchema = new SanitizrNumber();
+        return $numberSchema->integer();
+    }
+
+    /**
      * Creates a schema for validating string values.
      *
      * @return SanitizrString A new string schema instance.
@@ -78,14 +100,14 @@ class SanitizrStatic
     }
 
     /**
-     * Creates a batch schema that aggregates multiple schemas.
+     * Creates a tuple schema that aggregates multiple schemas.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schemas to include in the batch.
-     * @return SanitizrBatch The batch schema instance containing the provided schemas.
+     * @param AbstractSanitizrSchema ...$schemas One or more schemas to include in the tuple.
+     * @return SanitizrTuple The tuple schema instance containing the provided schemas.
      */
-    public static function batch(AbstractSanitizrSchema ...$schemas): SanitizrBatch
+    public static function tuple(AbstractSanitizrSchema ...$schemas): SanitizrTuple
     {
-        return new SanitizrBatch(...$schemas);
+        return new SanitizrTuple(...$schemas);
     }
 
     /**
@@ -146,17 +168,5 @@ class SanitizrStatic
     {
         $clonedSchema = clone $schema;
         return $clonedSchema->nonOptional();
-    }
-
-    public static function float(): SanitizrNumber
-    {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->float();
-    }
-
-    public static function integer(): SanitizrNumber
-    {
-        $numberSchema = new SanitizrNumber();
-        return $numberSchema->integer();
     }
 }
