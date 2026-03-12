@@ -278,6 +278,46 @@ class SanitizrString extends AbstractSanitizrSchema
         return $newSchema;
     }
 
+    /**
+     * Adds a validation rule to ensure the string contains only alphanumeric characters.
+     *
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function alphanumeric(string $message = SanitizrErrorMessage::STRING_ALPHANUMERIC): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
+            if (! ctype_alnum($input)) {
+                throw new SanitizrValidationException($message);
+            }
+        });
+
+        return $newSchema;
+    }
+
+    /**
+     * Adds a validation rule to ensure the string contains only digits.
+     *
+     * NOTE: This method validates that the string contains only numeric digits. It is
+     * named `digits()` rather than `numeric()` to avoid confusion with actual numbers
+     * and the `SanitizrNumber` schema.
+     *
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function digits(string $message = SanitizrErrorMessage::STRING_DIGITS): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
+            if (! ctype_digit($input)) {
+                throw new SanitizrValidationException($message);
+            }
+        });
+
+        return $newSchema;
+    }
+
     public function transform(callable $transformer): static
     {
         $newSchema = clone $this;
