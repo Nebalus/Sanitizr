@@ -17,6 +17,16 @@ class SanitizrObject extends AbstractSanitizrSchema
     }
 
     /**
+     * Retrieves the associative array of property schemas.
+     *
+     * @return array<string, AbstractSanitizrSchema> The property schemas defined for this object.
+     */
+    public function getPropertySchemas(): array
+    {
+        return $this->schemas;
+    }
+
+    /**
      * Parses and validates an input value as an object or associative array according to the defined schemas.
      *
      * Converts input objects to associative arrays, checks for required and optional properties,

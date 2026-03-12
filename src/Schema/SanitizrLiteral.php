@@ -17,6 +17,16 @@ class SanitizrLiteral extends AbstractSanitizrSchema
     }
 
     /**
+     * Retrieves the literal value configured for this schema.
+     *
+     * @return mixed The configured literal value.
+     */
+    public function getLiteralValue(): mixed
+    {
+        return $this->literalValue;
+    }
+
+    /**
      * Validates that the input matches the stored literal value or one of a set of literal values.
      *
      * If the stored literal value is a single value, the input must strictly equal it. If the stored literal value is an array, the input must loosely equal one of its elements. Throws a SanitizrValidationException if the input does not match.
