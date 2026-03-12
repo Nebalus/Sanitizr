@@ -21,6 +21,10 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
         private readonly string $discriminator,
         SanitizrObject ...$schemas
     ) {
+        if (count($schemas) === 0) {
+            throw new InvalidArgumentException("Discriminated union must have at least one schema option.");
+        }
+
         foreach ($schemas as $schema) {
             $properties = $schema->getPropertySchemas();
 
