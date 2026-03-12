@@ -42,11 +42,19 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
 
             if (is_array($literalValue)) {
                 foreach ($literalValue as $val) {
-                    $this->schemaMap[(string)$val] = $schema;
+                    $key = (string)$val;
+                    if (isset($this->schemaMap[$key])) {
+                        throw new InvalidArgumentException("Duplicate discriminator value '{$key}' in discriminated union.");
+                    }
+                    $this->schemaMap[$key] = $schema;
                 }
                 continue;
             }
-            $this->schemaMap[(string)$literalValue] = $schema;
+            $key = (string)$literalValue;
+            if (isset($this->schemaMap[$key])) {
+                throw new InvalidArgumentException("Duplicate discriminator value '{$key}' in discriminated union.");
+            }
+            $this->schemaMap[$key] = $schema;
         }
     }
 
