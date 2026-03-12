@@ -143,7 +143,6 @@ class SanitizrString extends AbstractSanitizrSchema
      * @param string $needle The substring that must be present in the input string.
      * @param string $message Optional custom error message. The substring will be injected via sprintf.
      * @return static The current schema instance for method chaining.
-     * @throws SanitizrValidationException If the input string does not contain the specified substring.
      */
     public function includes(string $needle, string $message = SanitizrErrorMessage::STRING_MUST_INCLUDE): static
     {
@@ -209,6 +208,29 @@ class SanitizrString extends AbstractSanitizrSchema
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
+                throw new SanitizrValidationException($message);
+            }
+        });
+
+        return $newSchema;
+    }
+
+    /**
+     * Adds a validation rule to ensure the string is a valid phone number.
+     *
+     * Throws a SanitizrValidationException with the provided message if the string does not match a general phone number format.
+     *
+     * NOTE: That regex is not perfect and can be improved. There will be a better way in the future to implement this functionality.
+     * Like implementing the https://github.com/giggsey/libphonenumber-for-php libary.
+     *
+     * @param string $message The error message to use if validation fails.
+     * @return static
+     */
+    public function phone(string $message = SanitizrErrorMessage::STRING_NOT_PHONE): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input) use ($message) {
+            if (! preg_match('/^\+?[0-9\s\-\(\)]{7,20}$/', $input)) {
                 throw new SanitizrValidationException($message);
             }
         });
@@ -376,7 +398,7 @@ class SanitizrString extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_STRING, string $path = ''): string
     {
-        if (! is_string($input)) {
+        if (!is_string($input)) {
             throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
         }
 

@@ -17,6 +17,7 @@ final class SanitizrErrorMessage
     public const string STRING_NOT_URL = "Not a valid URL";
     public const string STRING_MUST_START_WITH = "Does not start with required string prefix";
     public const string STRING_MUST_END_WITH = "Does not end with required string suffix";
+    public const string STRING_NOT_PHONE = "Not a valid phone number";
     public const string VALUE_MUST_BE_NUMERIC = "%s must be NUMERIC";
     public const string NUMBER_MUST_BE_GREATER_THAN = "Must be greater than %s";
     public const string NUMBER_MUST_BE_GREATER_THAN_OR_EQUAL = "Must be greater than or equal to %s";
