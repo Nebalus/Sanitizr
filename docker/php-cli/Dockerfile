@@ -1,7 +1,9 @@
 FROM php:8.3.13-cli-alpine AS base
 WORKDIR /var/www/
 RUN chown -R www-data:www-data .
-RUN apk update && apk add --no-cache php83-dev $PHPIZE_DEPS
+RUN apk update && apk add --no-cache php83-dev $PHPIZE_DEPS linux-headers \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug
 
 ####################################################################################
 
