@@ -10,7 +10,7 @@ $querySchema = S::object([
     'page' => S::number()->integer()->stringable()->default(1),
     'limit' => S::number()->integer()->stringable()->default(20),
     'active' => S::boolean()->stringable()->default(true),
-    
+
     // Applying data transformations
     'search' => S::string()->trim()->toLowerCase()->optional(),
 ]);
