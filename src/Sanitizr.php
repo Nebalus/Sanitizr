@@ -12,6 +12,7 @@ use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 use Nebalus\Sanitizr\Schema\SanitizrDiscriminatedUnion;
+use Nebalus\Sanitizr\Schema\SanitizrEnum;
 
 class Sanitizr
 {
@@ -24,6 +25,17 @@ class Sanitizr
     public function literal(mixed $value): SanitizrLiteral
     {
         return new SanitizrLiteral($value);
+    }
+
+    /**
+     * Creates a schema that matches one of several literal values (enum).
+     *
+     * @param array $values The allowed values.
+     * @return SanitizrEnum The enum schema instance.
+     */
+    public function enum(array $values): SanitizrEnum
+    {
+        return new SanitizrEnum($values);
     }
 
     /**
