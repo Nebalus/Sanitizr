@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace UnitTesting\Schema;
 
+use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use PHPUnit\Framework\TestCase;
-
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 
 class SanitizrObjectTest extends TestCase
 {
+    /**
+     * @throws SanitizrValidationException
+     */
     public function testTransform(): void
     {
         $schema = new SanitizrObject([
