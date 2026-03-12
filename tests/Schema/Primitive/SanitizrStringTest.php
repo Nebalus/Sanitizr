@@ -27,4 +27,15 @@ class SanitizrStringTest extends TestCase
         $schema = $schema->phone();
         $schema->parse('not_a_phone_number');
     }
+
+    public function testTransform(): void
+    {
+        $schema = (new SanitizrString())->email()->transform(function (string $input) {
+            return (object) ['email' => $input];
+        });
+
+        $result = $schema->parse('test@example.com');
+        $this->assertIsObject($result);
+        $this->assertSame('test@example.com', $result->email);
+    }
 }
