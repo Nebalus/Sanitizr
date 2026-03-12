@@ -11,6 +11,7 @@ use Nebalus\Sanitizr\Schema\SanitizrTuple;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
+use Nebalus\Sanitizr\Schema\SanitizrDiscriminatedUnion;
 
 class Sanitizr
 {
@@ -171,5 +172,17 @@ class Sanitizr
     {
         $clonedSchema = clone $schema;
         return $clonedSchema->nonOptional();
+    }
+
+    /**
+     * Creates a discriminated union schema that routes validation to a specific object schema based on a discriminator key.
+     *
+     * @param string $discriminator The key in the input array/object to use for discriminating the schema.
+     * @param SanitizrObject ...$schemas The schemas to include in the union. Each must have a SanitizrLiteral schema at the discriminator key.
+     * @return SanitizrDiscriminatedUnion The discriminated union schema.
+     */
+    public function discriminatedUnion(string $discriminator, SanitizrObject ...$schemas): SanitizrDiscriminatedUnion
+    {
+        return new SanitizrDiscriminatedUnion($discriminator, ...$schemas);
     }
 }
