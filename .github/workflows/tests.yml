@@ -1,0 +1,25 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Just
+        uses: extractions/setup-just@v2
+        
+      - name: Run Tests
+        run: just test
