@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - 2026-03-13
+## [1.1.1] - 2026-03-13
 ### Added
 - `SanitizrEnum` schema for validating values against PHP enums.
 - Static and instance methods `enum()` in `Sanitizr` and `SanitizrStatic` to easily create enum schemas.
 
-[1.2.0]: https://github.com/Nebalus/Sanitizr/compare/v1.1.0...v1.2.0
+[1.1.1]: https://github.com/Nebalus/Sanitizr/compare/v1.1.0...v1.1.1
 
 
 ## [1.1.0] - 2026-03-12
