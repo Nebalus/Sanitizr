@@ -100,9 +100,12 @@ class Sanitizr
     }
 
     /**
-     * Creates a tuple schema that applies multiple schemas in sequence.
+     * Creates a tuple schema that applies multiple schemas in sequence to a fixed-length array.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schemas to be applied in tuple.
+     * A Tuple is a data structure used to describe an array with a fixed length
+     * where each specific position (index) has a specific type.
+     *
+     * @param AbstractSanitizrSchema ...$schemas One or more schemas to apply mapped directly to their positional index.
      * @return SanitizrTuple The tuple schema instance.
      */
     public function tuple(AbstractSanitizrSchema ...$schemas): SanitizrTuple

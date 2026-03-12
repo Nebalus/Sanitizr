@@ -100,9 +100,12 @@ class SanitizrStatic
     }
 
     /**
-     * Creates a tuple schema that aggregates multiple schemas.
+     * Creates a tuple schema that aggregates multiple schemas mapped to an array's indices.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schemas to include in the tuple.
+     * A Tuple is a data structure used to describe an array with a fixed length
+     * where each specific position (index) has a specific type.
+     *
+     * @param AbstractSanitizrSchema ...$schemas One or more schemas to apply mapped directly to their positional index.
      * @return SanitizrTuple The tuple schema instance containing the provided schemas.
      */
     public static function tuple(AbstractSanitizrSchema ...$schemas): SanitizrTuple

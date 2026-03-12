@@ -10,7 +10,10 @@ class SanitizrTuple extends AbstractSanitizrSchema
     /**
      * Initializes the tuple schema with one or more schema objects.
      *
-     * @param AbstractSanitizrSchema ...$schemas One or more schema instances to include in the tuple.
+     * A Tuple is a data structure used to describe an array with a fixed length
+     * where each specific position (index) has a specific type.
+     *
+     * @param AbstractSanitizrSchema ...$schemas One or more schema instances to include mapped directly to their positional index.
      */
     public function __construct(
         AbstractSanitizrSchema ...$schemas
