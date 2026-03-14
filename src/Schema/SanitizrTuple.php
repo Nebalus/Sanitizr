@@ -49,7 +49,7 @@ class SanitizrTuple extends AbstractSanitizrSchema
                 $collectedErrors->addIssue(new SanitizrIssue(
                     code: SanitizrIssue::MISSING_KEY,
                     path: self::pathToArray($updatedPath),
-                    message: "The value at position " . $updatedPath . " is required",
+                    message: "Required",
                     expected: 'defined',
                     received: 'undefined',
                 ));
