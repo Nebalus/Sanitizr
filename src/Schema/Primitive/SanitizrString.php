@@ -479,7 +479,7 @@ class SanitizrString extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be a STRING", $path !== '' ? $path : 'Value'),
+                message: "Value must be a STRING",
                 expected: 'string',
                 received: gettype($input),
             ));

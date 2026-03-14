@@ -48,7 +48,7 @@ class SanitizrEnum extends AbstractSanitizrSchema
         throw SanitizrValidationException::fromIssue(new SanitizrIssue(
             code: SanitizrIssue::INVALID_ENUM_VALUE,
             path: self::pathToArray($path),
-            message: sprintf("%s must be one of: [%s]", $path !== '' ? $path : 'Value', $allowedValuesString),
+            message: sprintf("Value must be one of: [%s]", $allowedValuesString),
             expected: $allowedValuesString,
             received: is_scalar($input) ? (string) $input : gettype($input),
         ));

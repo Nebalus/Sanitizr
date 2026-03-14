@@ -58,7 +58,7 @@ class SanitizrLiteral extends AbstractSanitizrSchema
         throw SanitizrValidationException::fromIssue(new SanitizrIssue(
             code: SanitizrIssue::INVALID_LITERAL,
             path: self::pathToArray($path),
-            message: sprintf('%s must be literally "%s"', $path !== '' ? $path : 'Value', $expectedStr),
+            message: sprintf('Value must be literally "%s"', $expectedStr),
             expected: $expectedStr,
             received: is_scalar($input) ? (string) $input : gettype($input),
         ));

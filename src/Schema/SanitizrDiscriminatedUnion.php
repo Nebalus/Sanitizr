@@ -72,7 +72,7 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be an OBJECT or an ASSOCIATIVE ARRAY", $path !== '' ? $path : 'Value'),
+                message: "Value must be an OBJECT or an ASSOCIATIVE ARRAY",
                 expected: 'object',
                 received: gettype($input),
             ));
@@ -84,7 +84,7 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::MISSING_KEY,
                 path: self::pathToArray($discriminatorPath),
-                message: "Missing discriminator key '{$this->discriminator}'" . ($path !== '' ? " at path {$path}" : ''),
+                message: "Missing discriminator key '{$this->discriminator}'",
                 expected: 'defined',
                 received: 'undefined',
             ));
@@ -97,7 +97,7 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_UNION_DISCRIMINATOR,
                 path: self::pathToArray($discriminatorPath),
-                message: "Invalid discriminator value '{$discriminatorValue}'" . ($path !== '' ? " at path {$path}" : '') . ". Expected one of: [{$expectedKeys}]",
+                message: "Invalid discriminator value '{$discriminatorValue}'. Expected one of: [{$expectedKeys}]",
                 expected: $expectedKeys,
                 received: $discriminatorValue,
             ));

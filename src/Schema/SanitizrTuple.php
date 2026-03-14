@@ -32,7 +32,7 @@ class SanitizrTuple extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be an ARRAY", $path !== '' ? $path : 'Value'),
+                message: "Value must be an ARRAY",
                 expected: 'array',
                 received: gettype($input),
             ));

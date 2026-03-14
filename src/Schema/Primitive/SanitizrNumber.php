@@ -247,7 +247,7 @@ class SanitizrNumber extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be NUMERIC", $path !== '' ? $path : 'Value'),
+                message: "Value must be NUMERIC",
                 expected: 'number',
                 received: gettype($input),
             ));

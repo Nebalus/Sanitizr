@@ -16,7 +16,7 @@ class SanitizrNull extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be NULL", $path !== '' ? $path : 'Value'),
+                message: "Value must be NULL",
                 expected: 'null',
                 received: gettype($input),
             ));

@@ -29,7 +29,7 @@ class SanitizrBoolean extends AbstractSanitizrSchema
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
                 path: self::pathToArray($path),
-                message: sprintf("%s must be a BOOLEAN", $path !== '' ? $path : 'Value'),
+                message: "Value must be a BOOLEAN",
                 expected: 'boolean',
                 received: gettype($input),
             ));
