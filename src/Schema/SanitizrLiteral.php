@@ -2,6 +2,7 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrLiteral extends AbstractSanitizrSchema
@@ -29,15 +30,12 @@ class SanitizrLiteral extends AbstractSanitizrSchema
     /**
      * Validates that the input matches the stored literal value or one of a set of literal values.
      *
-     * If the stored literal value is a single value, the input must strictly equal it. If the stored literal value is an array, the input must loosely equal one of its elements. Throws a SanitizrValidationException if the input does not match.
-     *
      * @param mixed $input The value to validate.
-     * @param string $message Optional error message template with placeholders for the path and expected value.
      * @param string $path Optional input path for error reporting.
      * @return mixed The validated input if it matches the literal value or one of the allowed values.
      * @throws SanitizrValidationException If the input does not match the expected literal value(s).
      */
-    protected function parseValue(mixed $input, string $message = '%s must be literally "%s"', string $path = ''): mixed
+    protected function parseValue(mixed $input, string $path = ''): mixed
     {
         if ($this->literalValue === $input) {
             return $input;
@@ -51,6 +49,18 @@ class SanitizrLiteral extends AbstractSanitizrSchema
             }
         }
 
-        throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value', $this->literalValue));
+        $expectedStr = is_scalar($this->literalValue)
+            ? (string) $this->literalValue
+            : (is_array($this->literalValue)
+                ? implode(', ', array_map(fn($v) => is_scalar($v) ? (string) $v : gettype($v), $this->literalValue))
+                : gettype($this->literalValue));
+
+        throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+            code: SanitizrIssue::INVALID_LITERAL,
+            path: self::pathToArray($path),
+            message: sprintf('%s must be literally "%s"', $path !== '' ? $path : 'Value', $expectedStr),
+            expected: $expectedStr,
+            received: is_scalar($input) ? (string) $input : gettype($input),
+        ));
     }
 }

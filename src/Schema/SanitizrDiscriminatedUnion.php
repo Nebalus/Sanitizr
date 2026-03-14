@@ -3,6 +3,7 @@
 namespace Nebalus\Sanitizr\Schema;
 
 use InvalidArgumentException;
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
@@ -61,28 +62,48 @@ class SanitizrDiscriminatedUnion extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = '%s must be an OBJECT or an ASSOCIATIVE ARRAY', string $path = ''): mixed
+    protected function parseValue(mixed $input, string $path = ''): mixed
     {
         if (is_object($input)) {
             $input = get_object_vars($input);
         }
 
         if (!is_array($input)) {
-            throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_TYPE,
+                path: self::pathToArray($path),
+                message: sprintf("%s must be an OBJECT or an ASSOCIATIVE ARRAY", $path !== '' ? $path : 'Value'),
+                expected: 'object',
+                received: gettype($input),
+            ));
         }
 
+        $discriminatorPath = $path !== '' ? $path . '.' . $this->discriminator : $this->discriminator;
+
         if (!isset($input[$this->discriminator])) {
-            throw new SanitizrValidationException("Missing discriminator key '{$this->discriminator}'" . ($path !== '' ? " at path {$path}" : ''));
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::MISSING_KEY,
+                path: self::pathToArray($discriminatorPath),
+                message: "Missing discriminator key '{$this->discriminator}'" . ($path !== '' ? " at path {$path}" : ''),
+                expected: 'defined',
+                received: 'undefined',
+            ));
         }
 
         $discriminatorValue = (string) $input[$this->discriminator];
 
         if (!isset($this->schemaMap[$discriminatorValue])) {
             $expectedKeys = implode(', ', array_keys($this->schemaMap));
-            throw new SanitizrValidationException("Invalid discriminator value '{$discriminatorValue}'" . ($path !== '' ? " at path {$path}" : '') . ". Expected one of: [{$expectedKeys}]");
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_UNION_DISCRIMINATOR,
+                path: self::pathToArray($discriminatorPath),
+                message: "Invalid discriminator value '{$discriminatorValue}'" . ($path !== '' ? " at path {$path}" : '') . ". Expected one of: [{$expectedKeys}]",
+                expected: $expectedKeys,
+                received: $discriminatorValue,
+            ));
         }
 
-        // Delegate parsing to the matched schema
+        // Delegate parsing to the matched schema — path propagates through the object schema
         $matchedSchema = $this->schemaMap[$discriminatorValue];
         return $matchedSchema->parse($input, path: $path);
     }

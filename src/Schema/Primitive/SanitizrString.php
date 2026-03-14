@@ -2,9 +2,9 @@
 
 namespace Nebalus\Sanitizr\Schema\Primitive;
 
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use Nebalus\Sanitizr\Type\SanitizrErrorMessage;
 
 class SanitizrString extends AbstractSanitizrSchema
 {
@@ -12,17 +12,23 @@ class SanitizrString extends AbstractSanitizrSchema
      * Adds a validation rule that requires the string to have an exact length.
      *
      * @param int $length The required length of the string.
-     * @param string $message Optional custom error message if validation fails.
+     * @param string|null $message Optional custom error message if validation fails.
      * @return static The current schema instance for method chaining.
      */
-    public function length(int $length, string $message = SanitizrErrorMessage::STRING_LENGTH): static
+    public function length(int $length, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($length, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($length, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength !== $length) {
-                throw new SanitizrValidationException(sprintf($message, $length));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::TOO_SMALL,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf("Must be exact %s characters long", $length),
+                    expected: "length:$length",
+                    received: "length:$inputLength",
+                ));
             }
         });
 
@@ -32,20 +38,24 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string to have at least the specified minimum length.
      *
-     * If the string is shorter than the given minimum, a SanitizrValidationException is thrown with the provided error message.
-     *
      * @param int $min The minimum allowed length for the string.
-     * @param string $message The error message to use if validation fails. The placeholder `%s` will be replaced with the minimum length.
+     * @param string|null $message Optional custom error message if validation fails.
      * @return static The current schema instance for method chaining.
      */
-    public function min(int $min, string $message = SanitizrErrorMessage::STRING_MIN_LENGTH): static
+    public function min(int $min, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($min, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($min, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength < $min) {
-                throw new SanitizrValidationException(sprintf($message, $min));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::TOO_SMALL,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf("Must be %s or more characters long", $min),
+                    expected: "min:$min",
+                    received: "length:$inputLength",
+                ));
             }
         });
 
@@ -55,20 +65,24 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule to ensure the string does not exceed the specified maximum length.
      *
-     * Throws a SanitizrValidationException if the string's length is greater than the given maximum.
-     *
      * @param int $max The maximum allowed length for the string.
-     * @param string $message Optional custom error message, with `%s` replaced by the maximum length.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function max(int $max, string $message = SanitizrErrorMessage::STRING_MAX_LENGTH): static
+    public function max(int $max, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($max, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($max, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength > $max) {
-                throw new SanitizrValidationException(sprintf($message, $max));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::TOO_BIG,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf("Must be %s or fewer characters long", $max),
+                    expected: "max:$max",
+                    received: "length:$inputLength",
+                ));
             }
         });
 
@@ -78,21 +92,25 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string length to be within the specified inclusive range.
      *
-     * Throws a SanitizrValidationException if the string length is less than $min or greater than $max.
-     *
      * @param int $min The minimum allowed string length.
      * @param int $max The maximum allowed string length.
-     * @param string $message The error message to use if validation fails. Supports sprintf placeholders for $min and $max.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function between(int $min, int $max, string $message = SanitizrErrorMessage::STRING_BETWEEN_RANGE): static
+    public function between(int $min, int $max, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($min, $max, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($min, $max, $message) {
             $inputLength = strlen($input);
 
             if ($inputLength < $min || $inputLength > $max) {
-                throw new SanitizrValidationException(sprintf($message, $min, $max));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: $inputLength < $min ? SanitizrIssue::TOO_SMALL : SanitizrIssue::TOO_BIG,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf("Must be between %s and %s characters long", $min, $max),
+                    expected: "between:$min:$max",
+                    received: "length:$inputLength",
+                ));
             }
         });
 
@@ -102,15 +120,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string to be entirely uppercase.
      *
-     * @param string $message The error message to use if the validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static The current schema instance for method chaining.
      */
-    public function uppercase(string $message = SanitizrErrorMessage::STRING_ONLY_UPPERCASE): static
+    public function uppercase(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if ($input !== strtoupper($input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Must be uppercase",
+                ));
             }
         });
 
@@ -120,17 +142,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string to be entirely lowercase.
      *
-     * If the input string contains any uppercase characters, a SanitizrValidationException is thrown with the provided message.
-     *
-     * @param string $message Custom error message for validation failure.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function lowercase(string $message = SanitizrErrorMessage::STRING_ONLY_LOWERCASE): static
+    public function lowercase(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if ($input !== strtolower($input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Must be lowercase",
+                ));
             }
         });
 
@@ -141,15 +165,19 @@ class SanitizrString extends AbstractSanitizrSchema
      * Adds a validation rule that requires the string to contain the specified substring.
      *
      * @param string $needle The substring that must be present in the input string.
-     * @param string $message Optional custom error message. The substring will be injected via sprintf.
+     * @param string|null $message Optional custom error message.
      * @return static The current schema instance for method chaining.
      */
-    public function includes(string $needle, string $message = SanitizrErrorMessage::STRING_MUST_INCLUDE): static
+    public function includes(string $needle, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($needle, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($needle, $message) {
             if (!str_contains($input, $needle)) {
-                throw new SanitizrValidationException(sprintf($message, $needle));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf('Must include "%s"', $needle),
+                ));
             }
         });
 
@@ -160,15 +188,19 @@ class SanitizrString extends AbstractSanitizrSchema
      * Adds a validation rule that requires the string to match the given regular expression pattern.
      *
      * @param string $pattern The regular expression pattern to match.
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static The current schema instance for method chaining.
      */
-    public function regex(string $pattern, string $message = SanitizrErrorMessage::STRING_NOT_MATCHING_REGEX): static
+    public function regex(string $pattern, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($pattern, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($pattern, $message) {
             if (! preg_match($pattern, $input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Does not match the pattern",
+                ));
             }
         });
 
@@ -178,17 +210,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule to ensure the string is a valid email address.
      *
-     * Throws a SanitizrValidationException with the provided message if the string does not match a valid email format.
-     *
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function email(string $message = SanitizrErrorMessage::STRING_NOT_EMAIL): static
+    public function email(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_EMAIL)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Not a valid email address",
+                ));
             }
         });
 
@@ -198,17 +232,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string to be a valid URL.
      *
-     * Throws a SanitizrValidationException with the provided message if the string is not a valid URL.
-     *
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function url(string $message = SanitizrErrorMessage::STRING_NOT_URL): static
+    public function url(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if (! filter_var($input, FILTER_VALIDATE_URL)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Not a valid URL",
+                ));
             }
         });
 
@@ -218,20 +254,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule to ensure the string is a valid phone number.
      *
-     * Throws a SanitizrValidationException with the provided message if the string does not match a general phone number format.
-     *
-     * NOTE: That regex is not perfect and can be improved. There will be a better way in the future to implement this functionality.
-     * Like implementing the https://github.com/giggsey/libphonenumber-for-php libary.
-     *
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function phone(string $message = SanitizrErrorMessage::STRING_NOT_PHONE): static
+    public function phone(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if (! preg_match('/^(?=.*[0-9])\+?[0-9\s\-\(\)]{7,20}$/', $input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Not a valid phone number",
+                ));
             }
         });
 
@@ -242,15 +277,19 @@ class SanitizrString extends AbstractSanitizrSchema
      * Adds a validation rule that requires the string to start with the specified prefix.
      *
      * @param string $prefix The required starting substring.
-     * @param string $message Optional custom error message.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function startsWith(string $prefix, string $message = SanitizrErrorMessage::STRING_MUST_START_WITH): static
+    public function startsWith(string $prefix, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($prefix, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($prefix, $message) {
             if (str_starts_with($input, $prefix) === false) {
-                throw new SanitizrValidationException(sprintf($message, $prefix));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Does not start with required string prefix",
+                ));
             }
         });
 
@@ -260,18 +299,20 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule that requires the string to end with the specified suffix.
      *
-     * Throws a SanitizrValidationException with a formatted message if the string does not end with the given suffix.
-     *
      * @param string $suffix The required ending substring.
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function endsWith(string $suffix, string $message = SanitizrErrorMessage::STRING_MUST_END_WITH): static
+    public function endsWith(string $suffix, ?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($suffix, $message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($suffix, $message) {
             if (str_ends_with($input, $suffix) === false) {
-                throw new SanitizrValidationException(sprintf($message, $suffix));
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Does not end with required string suffix",
+                ));
             }
         });
 
@@ -281,15 +322,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule to ensure the string contains only alphanumeric characters.
      *
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function alphanumeric(string $message = SanitizrErrorMessage::STRING_ALPHANUMERIC): static
+    public function alphanumeric(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if (! ctype_alnum($input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Must be alphanumeric",
+                ));
             }
         });
 
@@ -299,19 +344,19 @@ class SanitizrString extends AbstractSanitizrSchema
     /**
      * Adds a validation rule to ensure the string contains only digits.
      *
-     * NOTE: This method validates that the string contains only numeric digits. It is
-     * named `digits()` rather than `numeric()` to avoid confusion with actual numbers
-     * and the `SanitizrNumber` schema.
-     *
-     * @param string $message The error message to use if validation fails.
+     * @param string|null $message Optional custom error message.
      * @return static
      */
-    public function digits(string $message = SanitizrErrorMessage::STRING_DIGITS): static
+    public function digits(?string $message = null): static
     {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input) use ($message) {
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
             if (! ctype_digit($input)) {
-                throw new SanitizrValidationException($message);
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Must contain only digits",
+                ));
             }
         });
 
@@ -424,15 +469,20 @@ class SanitizrString extends AbstractSanitizrSchema
      * Ensures the input is a string, throwing a SanitizrValidationException if not.
      *
      * @param mixed $input The value to validate as a string.
-     * @param string $message The error message template, with `%s` replaced by the path or 'Value'.
      * @param string $path The path or field name for error reporting.
      * @return string The validated string input.
      * @throws SanitizrValidationException If the input is not a string.
      */
-    protected function parseValue(mixed $input, string $message = SanitizrErrorMessage::VALUE_MUST_BE_STRING, string $path = ''): string
+    protected function parseValue(mixed $input, string $path = ''): string
     {
         if (!is_string($input)) {
-            throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_TYPE,
+                path: self::pathToArray($path),
+                message: sprintf("%s must be a STRING", $path !== '' ? $path : 'Value'),
+                expected: 'string',
+                received: gettype($input),
+            ));
         }
 
         return $input;

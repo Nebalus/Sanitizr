@@ -2,16 +2,18 @@
 
 namespace Nebalus\Sanitizr\Value;
 
+use Nebalus\Sanitizr\Error\SanitizrError;
+
 readonly class SafeParsedData
 {
     private function __construct(
         private bool $valid,
         private mixed $value,
-        private string|null $error
+        private SanitizrError|null $error
     ) {
     }
 
-    public static function from(bool $valid, mixed $value, string|null $error): self
+    public static function from(bool $valid, mixed $value, SanitizrError|null $error): self
     {
         return new self($valid, $value, $error);
     }
@@ -46,10 +48,20 @@ readonly class SafeParsedData
     }
 
     /**
-     * @return string
+     * Returns the structured error object, or null if validation succeeded.
+     */
+    public function getError(): ?SanitizrError
+    {
+        return $this->error;
+    }
+
+    /**
+     * Returns a flat error message string, or null if validation succeeded.
+     *
+     * @deprecated [v2.0.0] [Use getError()->getMessage() instead]
      */
     public function getErrorMessage(): ?string
     {
-        return $this->error;
+        return $this->error?->getMessage();
     }
 }

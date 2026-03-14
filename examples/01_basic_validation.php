@@ -32,7 +32,7 @@ if ($result->isValid()) {
     print_r($result->getValue());
     // Note that username is now lowercase: johndoe
 } else {
-    echo "Error: " . $result->getErrorMessage() . "\n";
+    echo "Error: " . $result->getError()->getMessage() . "\n";
 }
 
 echo "\n--- Invalid Input ---\n";
@@ -40,5 +40,8 @@ $result = $registerSchema->safeParse($invalidInput);
 if ($result->isValid()) {
     print_r($result->getValue());
 } else {
-    echo "Validation failed: " . $result->getErrorMessage() . "\n";
+    echo "Validation failed:\n";
+    foreach ($result->getError()->getIssues() as $issue) {
+        echo sprintf("  [%s] %s: %s\n", $issue->code, $issue->getPathString(), $issue->message);
+    }
 }

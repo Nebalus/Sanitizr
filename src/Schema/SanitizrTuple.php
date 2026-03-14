@@ -2,6 +2,8 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Error\SanitizrError;
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrTuple extends AbstractSanitizrSchema
@@ -24,28 +26,52 @@ class SanitizrTuple extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = "%s must be an ARRAY", string $path = ''): array
+    protected function parseValue(mixed $input, string $path = ''): array
     {
         if (! is_array($input)) {
-            throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_TYPE,
+                path: self::pathToArray($path),
+                message: sprintf("%s must be an ARRAY", $path !== '' ? $path : 'Value'),
+                expected: 'array',
+                received: gettype($input),
+            ));
         }
 
         $result = [];
+        $collectedErrors = new SanitizrError();
 
         $iterator = 0;
         foreach ($this->schemas as $schema) {
             $updatedPath = $path === '' ? "KEY" . $iterator : $path . ".KEY" . $iterator;
 
             if ($schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false) {
-                throw new SanitizrValidationException("The value at position " . $updatedPath . " is required");
+                $collectedErrors->addIssue(new SanitizrIssue(
+                    code: SanitizrIssue::MISSING_KEY,
+                    path: self::pathToArray($updatedPath),
+                    message: "The value at position " . $updatedPath . " is required",
+                    expected: 'defined',
+                    received: 'undefined',
+                ));
+                $iterator++;
+                continue;
             }
-            $currentValue = $input[$iterator] ?? null;
-            $result[] = $schema->parse(
-                $currentValue,
-                path: $updatedPath
-            );
+
+            try {
+                $currentValue = $input[$iterator] ?? null;
+                $result[] = $schema->parse(
+                    $currentValue,
+                    path: $updatedPath
+                );
+            } catch (SanitizrValidationException $e) {
+                $collectedErrors->merge($e->getError());
+            }
 
             $iterator++;
+        }
+
+        if ($collectedErrors->hasIssues()) {
+            throw SanitizrValidationException::fromError($collectedErrors);
         }
 
         return $result;

@@ -29,7 +29,7 @@ class Email
         $validData = $schema->safeParse($email);
 
         if ($validData->isError()) {
-            throw new SanitizrValidationException($validData->getErrorMessage());
+            throw SanitizrValidationException::fromError($validData->getError());
         }
 
         return new self($validData->getValue());
@@ -65,7 +65,7 @@ class MessageBody
     {
         $validData = static::getSchema()->safeParse($data);
         if ($validData->isError()) {
-            throw new SanitizrValidationException($validData->getErrorMessage());
+            throw SanitizrValidationException::fromError($validData->getError());
         }
         return $validData->getValue(); // Value is already transformed to `MessageBody`
     }
@@ -177,8 +177,8 @@ class SendRequest
     {
         $validData = static::getSchema()->safeParse($data);
         if ($validData->isError()) {
-            echo "Error Parsing " . $validData->getErrorMessage() . "\n";
-            throw new SanitizrValidationException($validData->getErrorMessage());
+            echo "Error Parsing " . $validData->getError()->getMessage() . "\n";
+            throw SanitizrValidationException::fromError($validData->getError());
         }
         return $validData->getValue(); // Value is transformed into SendRequest!
     }

@@ -2,6 +2,8 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Error\SanitizrError;
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 
 class SanitizrArray extends AbstractSanitizrSchema
@@ -19,16 +21,32 @@ class SanitizrArray extends AbstractSanitizrSchema
     /**
      * @throws SanitizrValidationException
      */
-    protected function parseValue(mixed $input, string $message = '%s must be an ARRAY', string $path = ''): array
+    protected function parseValue(mixed $input, string $path = ''): array
     {
         if (! is_array($input)) {
-            throw new SanitizrValidationException(sprintf($message, $path !== '' ? $path : 'Value'));
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_TYPE,
+                path: self::pathToArray($path),
+                message: sprintf("%s must be an ARRAY", $path !== '' ? $path : 'Value'),
+                expected: 'array',
+                received: gettype($input),
+            ));
         }
 
         $result = [];
+        $collectedErrors = new SanitizrError();
 
-        foreach ($input as $v) {
-            $result[] = $this->schema->parse($v);
+        foreach ($input as $index => $v) {
+            $updatedPath = $path === '' ? (string) $index : $path . '.' . $index;
+            try {
+                $result[] = $this->schema->parse($v, path: $updatedPath);
+            } catch (SanitizrValidationException $e) {
+                $collectedErrors->merge($e->getError());
+            }
+        }
+
+        if ($collectedErrors->hasIssues()) {
+            throw SanitizrValidationException::fromError($collectedErrors);
         }
 
         return $result;
