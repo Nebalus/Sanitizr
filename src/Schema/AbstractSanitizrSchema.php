@@ -2,6 +2,7 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Value\SafeParsedData;
 
@@ -189,6 +190,17 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Converts a dot-separated path string to a path array.
+     *
+     * @param string $path Dot-separated path (e.g. "user.address.zip")
+     * @return array Path segments (e.g. ["user", "address", "zip"])
+     */
+    protected static function pathToArray(string $path): array
+    {
+        return $path !== '' ? explode('.', $path) : [];
+    }
+
+    /**
      * Parses and validates the input value according to the schema, applying transformations and checks.
      *
      * If the schema is nullable and the input is null, returns null.
@@ -221,7 +233,7 @@ abstract class AbstractSanitizrSchema
             }
 
             foreach ($this->checkQueue as $check) {
-                $check[0]($parsedValue);
+                $check[0]($parsedValue, $path);
             }
 
             if ($this->andSchemas !== []) {
@@ -247,7 +259,12 @@ abstract class AbstractSanitizrSchema
                     // Ignore the exception and try the next schema
                 }
             }
-            throw new SanitizrValidationException("No valid schema found for the input value at path: " . $path, 0, $e);
+
+            throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                code: SanitizrIssue::INVALID_UNION,
+                path: self::pathToArray($path),
+                message: "No valid schema found for the input value",
+            ));
         }
     }
 
@@ -260,12 +277,12 @@ abstract class AbstractSanitizrSchema
             $result = $this->parse($input, path: $path);
             return SafeParsedData::from(true, $result, null);
         } catch (SanitizrValidationException $e) {
-            return SafeParsedData::from(false, null, $e->getMessage());
+            return SafeParsedData::from(false, null, $e->getError());
         }
     }
 
     /**
      * @throws SanitizrValidationException
      */
-    abstract protected function parseValue(mixed $input, string $message = '', string $path = ''): mixed;
+    abstract protected function parseValue(mixed $input, string $path = ''): mixed;
 }

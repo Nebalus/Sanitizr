@@ -32,5 +32,5 @@ if ($result->isValid()) {
     var_dump($data['active']);   // bool(false)
     var_dump($data['search']);   // string(11) "hello world"
 } else {
-    echo "Validation failed: " . $result->getErrorMessage() . "\n";
+    echo "Validation failed: " . $result->getError()->getMessage() . "\n";
 }

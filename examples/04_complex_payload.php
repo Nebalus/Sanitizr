@@ -88,5 +88,5 @@ if ($result->isValid()) {
     print_r($result->getValue());
 } else {
     echo "Payload is INVALID.\n";
-    echo "Error: " . $result->getErrorMessage() . "\n";
+    echo "Error: " . $result->getError()->getMessage() . "\n";
 }

@@ -32,5 +32,5 @@ if ($result->isValid()) {
     echo "Parsed successfully:\n";
     print_r($result->getValue());
 } else {
-    echo "Parsing failed: " . $result->getErrorMessage() . "\n";
+    echo "Parsing failed: " . $result->getError()->getMessage() . "\n";
 }
