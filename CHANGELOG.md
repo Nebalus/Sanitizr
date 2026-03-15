@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-03-15
+### Added
+- Zod-style structured error handling using `SanitizrError` and `SanitizrIssue` for more informative validation errors.
+
+### Changed
+- Optimised paths in error messages to prevent string duplication (e.g., removing redundant path prefixes in `SanitizrObject`, `SanitizrTuple`, and primitive schemas).
+
+### Fixed
+- Fixed bug causing doubled paths in "is required" error messages for array and object elements.
+
+[1.3.0]: https://github.com/Nebalus/Sanitizr/compare/v1.2.0...v1.3.0
+
+
 ## [1.2.0] - 2026-03-13
 ### Added
 - `SanitizrEnum` schema for validating values against PHP enums.
