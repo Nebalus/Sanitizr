@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-03-18
+### Added
+- Comprehensive string format validations mimicking Zod (e.g., `uuid`, `cuid2`, `ulid`, `ipv4`, `ipv6`, `mac`, `base64`, `emoji`, `jwt`, `hash`, `cidrv4`, `cidrv6`, etc.) to `SanitizrString`.
+- Array length constraints and validations (`min`, `max`, `between`, `notEmpty`, `empty`) to `SanitizrArray`.
+
+### Changed
+- Refactored `SanitizrDiscriminatedUnion` to a generalized `SanitizrUnion` schema allowing flexible multi-schema validation without strict discriminators.
+- Moved Union Schema structure into a dedicated folder.
+
+
 ## [1.2.0] - 2026-03-15
 ### Added
 - Zod-style structured error handling using `SanitizrError` and `SanitizrIssue` for more informative validation errors.

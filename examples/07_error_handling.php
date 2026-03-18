@@ -79,13 +79,12 @@ if ($result->isError()) {
     echo "\n  Serialized:\n" . json_encode($result->getError()->toArray(), JSON_PRETTY_PRINT) . "\n";
 }
 
-// ── 3. Discriminated Union with path ─────────────────────────────────────────
+// ── 3. Union with path ─────────────────────────────────────────
 
-echo "\n=== 3. Discriminated Union Errors ===\n";
+echo "\n=== 3. Union Errors ===\n";
 
 $eventSchema = S::object([
-    'event' => S::discriminatedUnion(
-        'type',
+    'event' => S::union(
         S::object([
             'type' => S::literal('click'),
             'x' => S::number(),
@@ -98,11 +97,11 @@ $eventSchema = S::object([
     ),
 ]);
 
-// Missing discriminator key
+// Missing discriminator key (fails union validation)
 $result = $eventSchema->safeParse(['event' => ['x' => 10]]);
 if ($result->isError()) {
     $issue = $result->getError()->getIssues()[0];
-    echo sprintf("  Missing discriminator: [%s] %s → %s\n", $issue->code, $issue->getPathString(), $issue->message);
+    echo sprintf("  Invalid union: [%s] %s → %s\n", $issue->code, $issue->getPathString(), $issue->message);
 }
 
 // Invalid discriminator value

@@ -7,12 +7,12 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrDiscriminatedUnion;
 use Nebalus\Sanitizr\Schema\SanitizrEnum;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 use Nebalus\Sanitizr\Schema\SanitizrTuple;
+use Nebalus\Sanitizr\Schema\Union\SanitizrUnion;
 
 class Sanitizr
 {
@@ -187,14 +187,13 @@ class Sanitizr
     }
 
     /**
-     * Creates a discriminated union schema that routes validation to a specific object schema based on a discriminator key.
+     * Creates a union schema that attempts to validate against a list of schemas.
      *
-     * @param string $discriminator The key in the input array/object to use for discriminating the schema.
-     * @param SanitizrObject ...$schemas The schemas to include in the union. Each must have a SanitizrLiteral schema at the discriminator key.
-     * @return SanitizrDiscriminatedUnion The discriminated union schema.
+     * @param AbstractSanitizrSchema ...$schemas The schemas to include in the union.
+     * @return SanitizrUnion The union schema.
      */
-    public function discriminatedUnion(string $discriminator, SanitizrObject ...$schemas): SanitizrDiscriminatedUnion
+    public function union(AbstractSanitizrSchema ...$schemas): SanitizrUnion
     {
-        return new SanitizrDiscriminatedUnion($discriminator, ...$schemas);
+        return new SanitizrUnion(...$schemas);
     }
 }

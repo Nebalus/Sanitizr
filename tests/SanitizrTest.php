@@ -9,11 +9,11 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrDiscriminatedUnion;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 use Nebalus\Sanitizr\Schema\SanitizrTuple;
+use Nebalus\Sanitizr\Schema\Union\SanitizrUnion;
 use PHPUnit\Framework\TestCase;
 
 class SanitizrTest extends TestCase
@@ -100,11 +100,11 @@ class SanitizrTest extends TestCase
         $this->assertFalse($schema->isOptional());
     }
 
-    public function testDiscriminatedUnion(): void
+    public function testUnion(): void
     {
         $this->assertInstanceOf(
-            SanitizrDiscriminatedUnion::class,
-            $this->sanitizr->discriminatedUnion('type', $this->sanitizr->object(['type' => $this->sanitizr->literal('a')]))
+            SanitizrUnion::class,
+            $this->sanitizr->union($this->sanitizr->object(['type' => $this->sanitizr->literal('a')]))
         );
     }
 }
