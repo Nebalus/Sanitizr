@@ -2,6 +2,7 @@
 
 namespace Nebalus\Sanitizr\Schema\Primitive;
 
+use InvalidArgumentException;
 use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
@@ -464,6 +465,304 @@ class SanitizrString extends AbstractSanitizrSchema
         return $newSchema;
     }
 
+
+    public function uuid(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid UUID",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function httpUrl(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! filter_var($input, FILTER_VALIDATE_URL) || ! preg_match('/^https?:\/\//i', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid HTTP(S) URL",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function hostname(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! filter_var($input, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid hostname",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function emoji(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F1E6}-\x{1F1FF}\x{1F200}-\x{1F2FF}\x{1F900}-\x{1F9FF}]$/u', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid emoji",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function base64(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid base64",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function base64url(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[A-Za-z0-9\-_]+$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid base64url",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function hex(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[a-fA-F0-9]+$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid hex string",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function jwt(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid JWT",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function nanoid(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[a-zA-Z0-9_-]{21}$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid nanoid",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function cuid(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^c[^\s-]{8,}$/i', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid CUID",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function cuid2(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[a-z][a-z0-9]*$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid CUID2",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function ulid(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^[0-9A-HJKMNP-TV-Z]{26}$/i', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid ULID",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function ipv4(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! filter_var($input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv4",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function ipv6(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! filter_var($input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv6",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function mac(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! filter_var($input, FILTER_VALIDATE_MAC)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid MAC address",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function cidrv4(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv4 CIDR",
+                ));
+            }
+            $parts = explode('/', $input);
+            if (! filter_var($input, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && ! filter_var($parts[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv4 CIDR",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function cidrv6(?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^([0-9a-fA-F:\.]+)\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/', $input, $matches)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv6 CIDR",
+                ));
+            }
+            if (! filter_var($matches[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid IPv6 CIDR",
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    public function hash(string $type, ?string $message = null): static
+    {
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($type, $message) {
+            $lengths = [
+                'md5' => 32,
+                'sha1' => 40,
+                'sha256' => 64,
+                'sha384' => 96,
+                'sha512' => 128
+            ];
+
+            if (! isset($lengths[$type])) {
+                throw new InvalidArgumentException("Invalid hash type specified: $type");
+            }
+
+            $length = $lengths[$type];
+            if (! preg_match('/^[a-fA-F0-9]{' . $length . '}$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid $type hash",
+                ));
+            }
+        });
+        return $newSchema;
+    }
 
     /**
      * Ensures the input is a string, throwing a SanitizrValidationException if not.
