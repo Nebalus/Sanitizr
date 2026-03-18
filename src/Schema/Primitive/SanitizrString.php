@@ -515,7 +515,7 @@ class SanitizrString extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input, string $path) use ($message) {
-            if (! preg_match('/^[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F1E6}-\x{1F1FF}\x{1F200}-\x{1F2FF}\x{1F900}-\x{1F9FF}]$/u', $input)) {
+            if (! preg_match('/^[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F1E6}-\x{1F1FF}\x{1F200}-\x{1F2FF}\x{1F900}-\x{1F9FF}]+$/u', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
