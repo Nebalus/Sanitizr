@@ -9,11 +9,11 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
-use Nebalus\Sanitizr\Schema\SanitizrUnion;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 use Nebalus\Sanitizr\Schema\SanitizrTuple;
+use Nebalus\Sanitizr\Schema\Union\SanitizrUnion;
 use PHPUnit\Framework\TestCase;
 
 class SanitizrStaticTest extends TestCase

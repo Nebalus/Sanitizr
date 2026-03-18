@@ -12,7 +12,7 @@ use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
 use Nebalus\Sanitizr\Schema\SanitizrTuple;
-use Nebalus\Sanitizr\Schema\SanitizrUnion;
+use Nebalus\Sanitizr\Schema\Union\SanitizrUnion;
 
 class Sanitizr
 {
