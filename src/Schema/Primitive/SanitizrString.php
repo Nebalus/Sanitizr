@@ -470,7 +470,7 @@ class SanitizrString extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input, string $path) use ($message) {
-            if (! preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i', $input)) {
+            if (! preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
@@ -515,7 +515,7 @@ class SanitizrString extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input, string $path) use ($message) {
-            if (! preg_match('/^[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F1E6}-\x{1F1FF}\x{1F200}-\x{1F2FF}\x{1F900}-\x{1F9FF}]$/u', $input)) {
+            if (! preg_match('/^[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F000}-\x{1F02F}\x{1F0A0}-\x{1F0FF}\x{1F1E6}-\x{1F1FF}\x{1F200}-\x{1F2FF}\x{1F900}-\x{1F9FF}]+$/u', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
@@ -545,7 +545,7 @@ class SanitizrString extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input, string $path) use ($message) {
-            if (! preg_match('/^[A-Za-z0-9\-_]+$/', $input)) {
+            if (! preg_match('/^(?:[A-Za-z0-9_-]{4})*(?:[A-Za-z0-9_-]{2}|[A-Za-z0-9_-]{3})?$/', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
