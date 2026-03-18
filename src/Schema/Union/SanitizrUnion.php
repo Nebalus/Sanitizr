@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
-use function Nebalus\Sanitizr\Schema\gettype;
 
 class SanitizrUnion extends AbstractSanitizrSchema
 {
