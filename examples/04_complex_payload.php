@@ -24,8 +24,8 @@ $smsChannelSchema = S::object([
     'recipients' => S::array(S::string()), // expecting phone numbers
 ]);
 
-// Use discriminatedUnion to explicitly route validation based on the `type` field
-$channelSchema = S::discriminatedUnion('type', $smtpChannelSchema, $smsChannelSchema);
+// Use union to explicitly route validation based on the `type` field
+$channelSchema = S::union($smtpChannelSchema, $smsChannelSchema);
 
 // 2. Define the schema for the message body contents
 $messageBodySchema = S::object([

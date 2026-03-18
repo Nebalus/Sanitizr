@@ -159,7 +159,7 @@ class SendRequest
     protected static function defineSchema(): AbstractSanitizrSchema
     {
         return S::object([
-            'channels' => S::array(S::discriminatedUnion('type', SmtpChannel::getSchema(), SmsChannel::getSchema())),
+            'channels' => S::array(S::union(SmtpChannel::getSchema(), SmsChannel::getSchema())),
             'message' => S::object([
                 'subject' => S::string(),
                 'body' => S::array(MessageBody::getSchema())
