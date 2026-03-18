@@ -545,7 +545,7 @@ class SanitizrString extends AbstractSanitizrSchema
     {
         $newSchema = clone $this;
         $newSchema->addCheck(function (string $input, string $path) use ($message) {
-            if (! preg_match('/^[A-Za-z0-9\-_]+$/', $input)) {
+            if (! preg_match('/^(?:[A-Za-z0-9_-]{4})*(?:[A-Za-z0-9_-]{2}|[A-Za-z0-9_-]{3})?$/', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
