@@ -21,7 +21,7 @@ The following is a set of guidelines for contributing to Sanitizr. These are mos
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the maintainers.
+This project and everyone participating in it is governed by a standard of mutual respect and professionalism. By participating, you are expected to uphold this standard. Please report unacceptable behavior to the maintainers.
 
 ## I don't want to read this whole thing, I just have a question!
 
@@ -44,23 +44,36 @@ Sanitizr is a Zod-inspired validation and filtering framework written in PHP. It
 
 The project structure includes:
 
-- **Core validators:** String, int, float, bool, object, array, and more
-- **Filters:** Transform and sanitize data
-- **Schema composition:** Build complex validators from primitives
-- **Error handling:** Clear error messages and validation results
+- **Schema types:** String, number, boolean, null, object, array, tuple, literal, enum, and union
+- **Transformations:** Transform and sanitize data via chainable methods (e.g., `trim()`, `toLowerCase()`)
+- **Schema composition:** Build complex validators from primitives using `object()`, `array()`, `tuple()`, and `union()`
+- **Error handling:** Structured error reporting with `SanitizrError`, `SanitizrIssue`, and `SafeParsedData`
 
 ### Repository Structure
 
 ```
 ├── src/
-│   ├── Validators/      # Core validator classes
-│   ├── Filters/         # Filter implementations
-│   ├── Results/         # Result and error handling
-│   └── SanitizrStatic.php  # Static API entry point
-├── tests/               # Test suite
-├── examples/            # Usage examples
-├── docs/                # Documentation
-└── composer.json        # Project dependencies and metadata
+│   ├── Error/               # Error and issue classes
+│   ├── Exception/           # Validation exception
+│   ├── Schema/
+│   │   ├── Primitive/       # String, Number, Boolean schemas
+│   │   ├── Union/           # Union schema
+│   │   ├── AbstractSanitizrSchema.php
+│   │   ├── SanitizrArray.php
+│   │   ├── SanitizrEnum.php
+│   │   ├── SanitizrLiteral.php
+│   │   ├── SanitizrNull.php
+│   │   ├── SanitizrObject.php
+│   │   └── SanitizrTuple.php
+│   ├── Trait/               # Reusable traits (stringable, value object)
+│   ├── Value/               # SafeParsedData value object
+│   ├── Sanitizr.php         # Instance-based API entry point
+│   └── SanitizrStatic.php   # Static API entry point
+├── tests/                   # Test suite (mirrors src/ structure)
+├── examples/                # Usage examples
+├── docker/                  # Docker configuration
+├── justfile                 # Development task runner
+└── composer.json            # Project dependencies and metadata
 ```
 
 ## How Can I Contribute?
@@ -169,29 +182,47 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Nebalu
 - Use strict types: `declare(strict_types=1);` at the top of each file
 - Use meaningful variable names
 - Add PHPDoc comments for public methods
+- All schema classes extend `AbstractSanitizrSchema`
+- Use `addCheck()` for validation rules and `addTransform()` for data transformations
 
 **Example:**
 
 ```php
 declare(strict_types=1);
 
-namespace Nebalus\Sanitizr\Validators;
+namespace Nebalus\Sanitizr\Schema\Primitive;
+
+use Nebalus\Sanitizr\Error\SanitizrIssue;
+use Nebalus\Sanitizr\Exception\SanitizrValidationException;
+use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 /**
- * Validates string values with various options
+ * Validates string values with various constraints and transformations.
  */
-class StringValidator implements ValidatorInterface
+class SanitizrString extends AbstractSanitizrSchema
 {
     /**
-     * Validate that the value is a string with minimum length
-     * 
-     * @param mixed $value The value to validate
-     * @param int $minLength Minimum required length
-     * @return bool True if valid, false otherwise
+     * Adds a validation rule that requires the string to have at least
+     * the specified minimum length.
+     *
+     * @param int $min The minimum allowed length for the string.
+     * @param string|null $message Optional custom error message if validation fails.
+     * @return static The current schema instance for method chaining.
      */
-    public function validateMinLength(mixed $value, int $minLength): bool
+    public function min(int $min, ?string $message = null): static
     {
-        return is_string($value) && strlen($value) >= $minLength;
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($min, $message) {
+            if (strlen($input) < $min) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::TOO_SMALL,
+                    path: self::pathToArray($path),
+                    message: $message ?? sprintf("Must be %s or more characters long", $min),
+                ));
+            }
+        });
+
+        return $newSchema;
     }
 }
 ```
@@ -208,7 +239,7 @@ class StringValidator implements ValidatorInterface
 
 ### Prerequisites
 
-- PHP 8.0 or higher
+- PHP 8.3 or higher
 - Composer
 
 ### Installation
@@ -232,27 +263,24 @@ class StringValidator implements ValidatorInterface
 ### Running Tests
 
 ```bash
-# Run all tests
-composer test
+# Run all tests via just (uses Docker)
+just test
 
-# Run tests with coverage
-composer test:coverage
+# Or run tests directly with phpunit
+vendor/bin/phpunit -c phpunit.xml
 
-# Run specific test file
-vendor/bin/phpunit tests/Validators/StringValidatorTest.php
+# Run a specific test file
+vendor/bin/phpunit tests/Schema/Primitive/SanitizrStringTest.php
 ```
 
 ### Useful Commands
 
 ```bash
-# Run code style checker
-composer lint
+# Run linting (PHPMD + PHP_CodeSniffer, via Docker)
+just lint
 
-# Fix code style issues
-composer lint:fix
-
-# Run static analysis
-composer analyze
+# Build the Docker environment
+just build
 ```
 
 ## Recognition
