@@ -7,7 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [2.1.0] - 2026-03-18
+> **Note:** This tag points to the same commit as `v1.3.0`, which was incorrectly released as a minor version despite containing breaking changes.
+
+### Added
+- Comprehensive string format validations mimicking Zod (e.g., `uuid`, `cuid2`, `ulid`, `ipv4`, `ipv6`, `mac`, `base64`, `emoji`, `jwt`, `hash`, `cidrv4`, `cidrv6`, etc.) to `SanitizrString`.
+- Array length constraints and validations (`min`, `max`, `between`, `notEmpty`, `empty`) to `SanitizrArray`.
+
+### Changed
+- Refactored `SanitizrDiscriminatedUnion` to a generalized `SanitizrUnion` schema allowing flexible multi-schema validation without strict discriminators.
+- Moved Union Schema structure into a dedicated folder.
+
+[2.1.0]: https://github.com/Nebalus/Sanitizr/compare/v2.0.0...v2.1.0
+
+
+## [2.0.0] - 2026-05-13
+> **Note:** This tag points to the same commit as `v1.2.0`, which was incorrectly released as a minor version despite containing breaking changes.
+
+### Added
+- Zod-style structured error handling using `SanitizrError` and `SanitizrIssue` for more informative validation errors.
+- `SanitizrEnum` schema for validating values against PHP enums.
+- Static and instance methods `enum()` in `Sanitizr` and `SanitizrStatic` to easily create enum schemas.
+
+### Changed
+- Optimised paths in error messages to prevent string duplication (e.g., removing redundant path prefixes in `SanitizrObject`, `SanitizrTuple`, and primitive schemas).
+
+### Fixed
+- Fixed bug causing doubled paths in "is required" error messages for array and object elements.
+
+[2.0.0]: https://github.com/Nebalus/Sanitizr/compare/v1.1.1...v2.0.0
+
+
 ## [1.3.0] - 2026-03-18
+> **Note:** This release contained breaking changes and has been retroactively re-tagged as `v2.1.0`. Use `v2.1.0` instead.
+
 ### Added
 - Comprehensive string format validations mimicking Zod (e.g., `uuid`, `cuid2`, `ulid`, `ipv4`, `ipv6`, `mac`, `base64`, `emoji`, `jwt`, `hash`, `cidrv4`, `cidrv6`, etc.) to `SanitizrString`.
 - Array length constraints and validations (`min`, `max`, `between`, `notEmpty`, `empty`) to `SanitizrArray`.
@@ -20,6 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [1.2.0] - 2026-03-15
+> **Note:** This release contained breaking changes and has been retroactively re-tagged as `v2.0.0`. Use `v2.0.0` instead.
+
 ### Added
 - Zod-style structured error handling using `SanitizrError` and `SanitizrIssue` for more informative validation errors.
 - `SanitizrEnum` schema for validating values against PHP enums.
