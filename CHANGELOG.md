@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-05
+### Added
+- isValid() Methode in the SanitizrValueObjectTrait
+
+[2.1.1]: https://github.com/Nebalus/Sanitizr/compare/v2.1.0...v2.1.1
+
 
 ## [2.1.0] - 2026-03-18
 > **Note:** This tag points to the same commit as `v1.3.0`, which was incorrectly released as a minor version despite containing breaking changes.
