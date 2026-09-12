@@ -9,6 +9,18 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 class SanitizrString extends AbstractSanitizrSchema
 {
+    /**
+     * Hex digest lengths of the supported hash algorithms, keyed by their lowercase name.
+     */
+    private const array HASH_LENGTHS = [
+        'md5' => 32,
+        'sha1' => 40,
+        'sha224' => 56,
+        'sha256' => 64,
+        'sha384' => 96,
+        'sha512' => 128,
+    ];
+
     /****
      * Adds a validation rule that requires the string to have an exact length.
      *
@@ -24,7 +36,7 @@ class SanitizrString extends AbstractSanitizrSchema
 
             if ($inputLength !== $length) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
-                    code: SanitizrIssue::TOO_SMALL,
+                    code: $inputLength < $length ? SanitizrIssue::TOO_SMALL : SanitizrIssue::TOO_BIG,
                     path: self::pathToArray($path),
                     message: $message ?? sprintf("Must be exact %s characters long", $length),
                     expected: "length:$length",
@@ -738,26 +750,109 @@ class SanitizrString extends AbstractSanitizrSchema
 
     public function hash(string $type, ?string $message = null): static
     {
+        $algorithm = strtolower($type);
+
+        if (! isset(self::HASH_LENGTHS[$algorithm])) {
+            throw new InvalidArgumentException("Invalid hash type specified: $type");
+        }
+
+        return $this->hexDigest($algorithm, $message);
+    }
+
+    public function md5(?string $message = null): static
+    {
+        return $this->hexDigest('md5', $message);
+    }
+
+    public function sha1(?string $message = null): static
+    {
+        return $this->hexDigest('sha1', $message);
+    }
+
+    public function sha224(?string $message = null): static
+    {
+        return $this->hexDigest('sha224', $message);
+    }
+
+    public function sha256(?string $message = null): static
+    {
+        return $this->hexDigest('sha256', $message);
+    }
+
+    public function sha384(?string $message = null): static
+    {
+        return $this->hexDigest('sha384', $message);
+    }
+
+    public function sha512(?string $message = null): static
+    {
+        return $this->hexDigest('sha512', $message);
+    }
+
+    public function bcrypt(?string $message = null): static
+    {
         $newSchema = clone $this;
-        $newSchema->addCheck(function (string $input, string $path) use ($type, $message) {
-            $lengths = [
-                'md5' => 32,
-                'sha1' => 40,
-                'sha256' => 64,
-                'sha384' => 96,
-                'sha512' => 128
-            ];
-
-            if (! isset($lengths[$type])) {
-                throw new InvalidArgumentException("Invalid hash type specified: $type");
+        $newSchema->addCheck(function (string $input, string $path) use ($message) {
+            if (! preg_match('/^\$2[aby]\$(0[4-9]|[12][0-9]|3[01])\$[.\/A-Za-z0-9]{53}$/', $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid bcrypt hash",
+                    expected: "bcrypt hash",
+                ));
             }
+        });
+        return $newSchema;
+    }
 
-            $length = $lengths[$type];
+    public function argon2i(?string $message = null): static
+    {
+        return $this->argon2Digest('i', $message);
+    }
+
+    public function argon2id(?string $message = null): static
+    {
+        return $this->argon2Digest('id', $message);
+    }
+
+    /**
+     * Validates a hex digest by its expected length.
+     *
+     * Note that this can only confirm the shape of a digest, never which algorithm
+     * produced it: algorithms of equal output size are indistinguishable here.
+     */
+    private function hexDigest(string $algorithm, ?string $message): static
+    {
+        $length = self::HASH_LENGTHS[$algorithm];
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($length, $algorithm, $message) {
             if (! preg_match('/^[a-fA-F0-9]{' . $length . '}$/', $input)) {
                 throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                     code: SanitizrIssue::INVALID_STRING,
                     path: self::pathToArray($path),
-                    message: $message ?? "Invalid $type hash",
+                    message: $message ?? "Invalid $algorithm hash",
+                    expected: "$algorithm hash",
+                    received: "length:" . strlen($input),
+                ));
+            }
+        });
+        return $newSchema;
+    }
+
+    private function argon2Digest(string $variant, ?string $message): static
+    {
+        $pattern = '/^\$argon2' . $variant
+            . '\$v=\d+\$m=\d+,t=\d+,p=\d+(?:,keyid=[A-Za-z0-9+\/]+)?(?:,data=[A-Za-z0-9+\/]+)?'
+            . '\$[A-Za-z0-9+\/]+\$[A-Za-z0-9+\/]+$/';
+
+        $newSchema = clone $this;
+        $newSchema->addCheck(function (string $input, string $path) use ($pattern, $variant, $message) {
+            if (! preg_match($pattern, $input)) {
+                throw SanitizrValidationException::fromIssue(new SanitizrIssue(
+                    code: SanitizrIssue::INVALID_STRING,
+                    path: self::pathToArray($path),
+                    message: $message ?? "Invalid argon2$variant hash",
+                    expected: "argon2$variant hash",
                 ));
             }
         });
