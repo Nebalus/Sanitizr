@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace UnitTesting\Schema\Primitive;
 
+use InvalidArgumentException;
+use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 
@@ -332,5 +335,483 @@ class SanitizrStringTest extends TestCase
         $schema = clone new SanitizrString();
         $schema = $schema->hash('md5');
         $schema->parse('too-short');
+    }
+
+    public function testHashTypeIsCaseInsensitive(): void
+    {
+        $digest = hash('sha256', 'sanitizr');
+        $schema = (new SanitizrString())->hash('SHA256');
+        $this->assertSame($digest, $schema->parse($digest));
+    }
+
+    public function testHashRejectsUnknownTypeAtBuildTime(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        (new SanitizrString())->hash('sha999');
+    }
+
+    public static function hexDigestProvider(): array
+    {
+        return [
+            'md5' => ['md5'],
+            'sha1' => ['sha1'],
+            'sha224' => ['sha224'],
+            'sha256' => ['sha256'],
+            'sha384' => ['sha384'],
+            'sha512' => ['sha512'],
+        ];
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    #[DataProvider('hexDigestProvider')]
+    public function testDedicatedHexDigestAcceptsBothCases(string $algorithm): void
+    {
+        $digest = hash($algorithm, 'sanitizr');
+        $schema = (new SanitizrString())->$algorithm();
+        $this->assertSame($digest, $schema->parse($digest));
+        $this->assertSame(strtoupper($digest), $schema->parse(strtoupper($digest)));
+    }
+
+    #[DataProvider('hexDigestProvider')]
+    public function testDedicatedHexDigestRejectsWrongLength(string $algorithm): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->$algorithm();
+        $schema->parse(substr(hash($algorithm, 'sanitizr'), 0, -1));
+    }
+
+    #[DataProvider('hexDigestProvider')]
+    public function testDedicatedHexDigestRejectsNonHex(string $algorithm): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->$algorithm();
+        $schema->parse(str_repeat('z', strlen(hash($algorithm, 'sanitizr'))));
+    }
+
+    #[DataProvider('hexDigestProvider')]
+    public function testDedicatedHexDigestReportsAlgorithmAndLength(string $algorithm): void
+    {
+        $issue = $this->issueFrom((new SanitizrString())->$algorithm(), 'abc');
+
+        $this->assertSame("$algorithm hash", $issue->expected);
+        $this->assertSame('length:3', $issue->received);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testBcryptValidationSuccess(): void
+    {
+        $hash = password_hash('correct horse battery staple', PASSWORD_BCRYPT);
+        $schema = (new SanitizrString())->bcrypt();
+        $this->assertSame($hash, $schema->parse($hash));
+    }
+
+    public function testBcryptValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->bcrypt();
+        $schema->parse('$2y$10$tooshort');
+    }
+
+    public function testBcryptRejectsIdentifierWithoutVariantLetter(): void
+    {
+        $valid = password_hash('correct horse battery staple', PASSWORD_BCRYPT);
+
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->bcrypt();
+        $schema->parse('$2$' . substr($valid, 4));
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testArgon2ValidationSuccess(): void
+    {
+        if (! defined('PASSWORD_ARGON2ID')) {
+            $this->markTestSkipped('Argon2 support is not compiled into this PHP build');
+        }
+
+        $argon2i = password_hash('correct horse battery staple', PASSWORD_ARGON2I);
+        $argon2id = password_hash('correct horse battery staple', PASSWORD_ARGON2ID);
+
+        $this->assertSame($argon2i, (new SanitizrString())->argon2i()->parse($argon2i));
+        $this->assertSame($argon2id, (new SanitizrString())->argon2id()->parse($argon2id));
+    }
+
+    public function testArgon2iRejectsArgon2idHash(): void
+    {
+        if (! defined('PASSWORD_ARGON2ID')) {
+            $this->markTestSkipped('Argon2 support is not compiled into this PHP build');
+        }
+
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->argon2i();
+        $schema->parse(password_hash('correct horse battery staple', PASSWORD_ARGON2ID));
+    }
+
+    public function testArgon2idValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        $schema = (new SanitizrString())->argon2id();
+        $schema->parse('$argon2id$v=19$m=65536,t=4,p=1$missingthehashpart');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testLengthValidationSuccess(): void
+    {
+        $schema = (new SanitizrString())->length(5);
+        $this->assertSame('hello', $schema->parse('hello'));
+    }
+
+    public function testLengthRejectsShorterInput(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->length(5)->parse('hell');
+    }
+
+    public function testLengthRejectsLongerInput(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->length(5)->parse('hello!');
+    }
+
+    public function testLengthReportsTooSmallForShorterInput(): void
+    {
+        $issue = $this->issueFrom((new SanitizrString())->length(5), 'hell');
+
+        $this->assertSame(SanitizrIssue::TOO_SMALL, $issue->code);
+        $this->assertSame('length:5', $issue->expected);
+        $this->assertSame('length:4', $issue->received);
+    }
+
+    public function testLengthReportsTooBigForLongerInput(): void
+    {
+        $issue = $this->issueFrom((new SanitizrString())->length(5), 'hello!');
+
+        $this->assertSame(SanitizrIssue::TOO_BIG, $issue->code);
+        $this->assertSame('length:5', $issue->expected);
+        $this->assertSame('length:6', $issue->received);
+    }
+
+    public function testBetweenReportsDirectionalIssueCodes(): void
+    {
+        $schema = (new SanitizrString())->between(2, 4);
+
+        $this->assertSame(SanitizrIssue::TOO_SMALL, $this->issueFrom($schema, 'a')->code);
+        $this->assertSame(SanitizrIssue::TOO_BIG, $this->issueFrom($schema, 'abcde')->code);
+    }
+
+    public function testMinAndMaxReportDirectionalIssueCodes(): void
+    {
+        $this->assertSame(
+            SanitizrIssue::TOO_SMALL,
+            $this->issueFrom((new SanitizrString())->min(3), 'ab')->code
+        );
+        $this->assertSame(
+            SanitizrIssue::TOO_BIG,
+            $this->issueFrom((new SanitizrString())->max(3), 'abcd')->code
+        );
+    }
+
+    /**
+     * Parses input that is expected to fail and returns the first reported issue.
+     */
+    private function issueFrom(SanitizrString $schema, string $input): SanitizrIssue
+    {
+        try {
+            $schema->parse($input);
+        } catch (SanitizrValidationException $e) {
+            return $e->getError()->getIssues()[0];
+        }
+
+        $this->fail('Expected a validation exception');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testMinValidation(): void
+    {
+        $schema = (new SanitizrString())->min(3);
+        $this->assertSame('abc', $schema->parse('abc'));
+        $this->assertSame('abcd', $schema->parse('abcd'));
+    }
+
+    public function testMinValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->min(3)->parse('ab');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testMaxValidation(): void
+    {
+        $schema = (new SanitizrString())->max(3);
+        $this->assertSame('abc', $schema->parse('abc'));
+        $this->assertSame('a', $schema->parse('a'));
+    }
+
+    public function testMaxValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->max(3)->parse('abcd');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testBetweenValidationIsInclusive(): void
+    {
+        $schema = (new SanitizrString())->between(2, 4);
+        $this->assertSame('ab', $schema->parse('ab'));
+        $this->assertSame('abcd', $schema->parse('abcd'));
+    }
+
+    public function testBetweenRejectsBelowMinimum(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->between(2, 4)->parse('a');
+    }
+
+    public function testBetweenRejectsAboveMaximum(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->between(2, 4)->parse('abcde');
+    }
+
+    public function testLengthIssueCarriesExpectedAndReceived(): void
+    {
+        $issue = $this->issueFrom((new SanitizrString())->min(4), 'ab');
+
+        $this->assertSame('min:4', $issue->expected);
+        $this->assertSame('length:2', $issue->received);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testUppercaseValidation(): void
+    {
+        $schema = (new SanitizrString())->uppercase();
+        $this->assertSame('ABC', $schema->parse('ABC'));
+        $this->assertSame('A1!', $schema->parse('A1!'));
+    }
+
+    public function testUppercaseValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->uppercase()->parse('AbC');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testLowercaseValidation(): void
+    {
+        $schema = (new SanitizrString())->lowercase();
+        $this->assertSame('abc', $schema->parse('abc'));
+    }
+
+    public function testLowercaseValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->lowercase()->parse('aBc');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testIncludesValidation(): void
+    {
+        $schema = (new SanitizrString())->includes('bar');
+        $this->assertSame('foobarbaz', $schema->parse('foobarbaz'));
+    }
+
+    public function testIncludesValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->includes('bar')->parse('foobaz');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testRegexValidation(): void
+    {
+        $schema = (new SanitizrString())->regex('/^[a-z]+-\d+$/');
+        $this->assertSame('item-42', $schema->parse('item-42'));
+    }
+
+    public function testRegexValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->regex('/^[a-z]+-\d+$/')->parse('Item-42');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testEmailValidation(): void
+    {
+        $schema = (new SanitizrString())->email();
+        $this->assertSame('test@example.com', $schema->parse('test@example.com'));
+        $this->assertSame('a.b+c@sub.example.co.uk', $schema->parse('a.b+c@sub.example.co.uk'));
+    }
+
+    public function testEmailValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->email()->parse('not-an-email');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testUrlValidation(): void
+    {
+        $schema = (new SanitizrString())->url();
+        $this->assertSame('https://example.com/a?b=1', $schema->parse('https://example.com/a?b=1'));
+    }
+
+    public function testUrlValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->url()->parse('not a url');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testStartsWithValidation(): void
+    {
+        $schema = (new SanitizrString())->startsWith('pre_');
+        $this->assertSame('pre_value', $schema->parse('pre_value'));
+    }
+
+    public function testStartsWithValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->startsWith('pre_')->parse('value_pre_');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testEndsWithValidation(): void
+    {
+        $schema = (new SanitizrString())->endsWith('.txt');
+        $this->assertSame('notes.txt', $schema->parse('notes.txt'));
+    }
+
+    public function testEndsWithValidationFailure(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->endsWith('.txt')->parse('notes.txt.bak');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testDigitsValidation(): void
+    {
+        $schema = (new SanitizrString())->digits();
+        $this->assertSame('0123456789', $schema->parse('0123456789'));
+    }
+
+    public function testDigitsRejectsNonDigits(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->digits()->parse('12a');
+    }
+
+    public function testDigitsRejectsEmptyString(): void
+    {
+        $this->expectException(SanitizrValidationException::class);
+        (new SanitizrString())->digits()->parse('');
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testTrimTransformation(): void
+    {
+        $schema = (new SanitizrString())->trim();
+        $this->assertSame('hello', $schema->parse("  hello \n"));
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testCaseTransformations(): void
+    {
+        $this->assertSame('abc', (new SanitizrString())->toLowerCase()->parse('AbC'));
+        $this->assertSame('ABC', (new SanitizrString())->toUpperCase()->parse('AbC'));
+        $this->assertSame('Hello World', (new SanitizrString())->toTitleCase()->parse('hELLO wORLD'));
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testStripTagsTransformation(): void
+    {
+        $schema = (new SanitizrString())->stripTags();
+        $this->assertSame('bold text', $schema->parse('<b>bold</b> text'));
+
+        $keepBold = (new SanitizrString())->stripTags('<b>');
+        $this->assertSame('<b>bold</b> text', $keepBold->parse('<b>bold</b> <i>text</i>'));
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    public function testHtmlSpecialCharsTransformation(): void
+    {
+        $schema = (new SanitizrString())->htmlSpecialChars();
+        $this->assertSame('&lt;a href=&quot;x&quot;&gt;', $schema->parse('<a href="x">'));
+    }
+
+    /**
+     * Transforms are applied before checks regardless of the order they were chained in.
+     *
+     * @throws SanitizrValidationException
+     */
+    public function testTransformsRunBeforeChecksRegardlessOfChainOrder(): void
+    {
+        $trimThenCheck = (new SanitizrString())->trim()->length(5);
+        $checkThenTrim = (new SanitizrString())->length(5)->trim();
+
+        $this->assertSame('hello', $trimThenCheck->parse('  hello  '));
+        $this->assertSame('hello', $checkThenTrim->parse('  hello  '));
+    }
+
+    /**
+     * Every rule returns a clone, so a base schema is never mutated by deriving from it.
+     *
+     * @throws SanitizrValidationException
+     */
+    public function testRulesReturnCloneAndLeaveBaseSchemaUntouched(): void
+    {
+        $base = new SanitizrString();
+        $restricted = $base->min(5);
+
+        $this->assertNotSame($base, $restricted);
+        $this->assertSame('ab', $base->parse('ab'));
+
+        $this->expectException(SanitizrValidationException::class);
+        $restricted->parse('ab');
+    }
+
+    public function testCustomMessageOverridesDefault(): void
+    {
+        $issue = $this->issueFrom((new SanitizrString())->sha256('my custom message'), 'nope');
+
+        $this->assertSame('my custom message', $issue->message);
     }
 }

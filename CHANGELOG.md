@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-09-05
+### Added
+- Dedicated hash format validations on `SanitizrString`: `md5()`, `sha1()`, `sha224()`, `sha256()`, `sha384()` and `sha512()`.
+- Password hash format validations on `SanitizrString`: `bcrypt()`, `argon2i()` and `argon2id()`.
+
+### Fixed
+- `SanitizrString::length()` reported the issue code `too_small` even when the input was too long; it now reports `too_big` in that case, matching `between()`.
+
+### Changed
+- `SanitizrString::hash()` now also accepts `sha224` and matches the algorithm name case-insensitively.
+- **Breaking:** `SanitizrString::hash()` now rejects an unknown algorithm name with an `InvalidArgumentException` when the schema is built, instead of on the first `parse()` call.
+- Hash validation issues now carry `expected` (e.g. `sha256 hash`) and `received` (e.g. `length:63`) details.
+
+[2.2.0]: https://github.com/Nebalus/Sanitizr/compare/v2.1.1...v2.2.0
+
+
 ## [2.1.1] - 2026-09-05
 ### Added
 - isValid() Methode in the SanitizrValueObjectTrait
