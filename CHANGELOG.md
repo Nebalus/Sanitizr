@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.2.0] - 2026-09-05
+## [2.2.0] - 2026-09-13
 ### Added
 - Dedicated hash format validations on `SanitizrString`: `md5()`, `sha1()`, `sha224()`, `sha256()`, `sha384()` and `sha512()`.
 - Password hash format validations on `SanitizrString`: `bcrypt()`, `argon2i()` and `argon2id()`.
