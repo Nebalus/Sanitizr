@@ -6,15 +6,32 @@ use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 
 trait SanitizrValueObjectTrait
 {
-    private static AbstractSanitizrSchema $schemaCache;
+    /**
+     * Compiled schemas, one entry per concrete class.
+     *
+     * A static property declared in a trait is copied into the class that uses
+     * the trait exactly once, and every subclass of that class shares it. So a
+     * single cached schema would mean that, in a hierarchy such as
+     * `abstract class Id { use SanitizrValueObjectTrait; }` with `UserId` and
+     * `OrderId` extending it, whichever subclass was touched first would decide
+     * what all the others validate. Keying the cache by `static::class` gives
+     * each concrete class its own slot in the one shared property.
+     *
+     * @var array<class-string, AbstractSanitizrSchema>
+     */
+    private static array $schemaCache = [];
 
+    /**
+     * Returns a clone of this class's compiled schema, building it on first use.
+     *
+     * Late-bound (`static::`) rather than `self::` so that the schema is defined
+     * by the class the call was made on, not the class that uses the trait —
+     * calling `self::defineSchema()` from a using base class would try to invoke
+     * the base class's abstract method and fail.
+     */
     public static function getSchema(): AbstractSanitizrSchema
     {
-        if (isset(self::$schemaCache)) {
-            return clone self::$schemaCache;
-        }
-        self::$schemaCache = self::defineSchema();
-        return clone self::$schemaCache;
+        return clone (self::$schemaCache[static::class] ??= static::defineSchema());
     }
 
     /**
