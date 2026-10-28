@@ -211,7 +211,8 @@ your types, and `encode()` turns them back:
 $priceInCents = S::codec(
     S::string()->regex('/^\d+\.\d{2}$/'),  // encoded form
     S::integer()->nonNegative(),           // decoded form
-    decode: fn(string $v) => (int) round((float) $v * 100),
+    // integer arithmetic only; past PHP_INT_MAX the result becomes a float, which S::integer() rejects
+    decode: fn(string $v) => (int) strstr($v, '.', true) * 100 + (int) substr($v, -2),
     encode: fn(int $cents) => sprintf('%d.%02d', intdiv($cents, 100), $cents % 100),
 );
 

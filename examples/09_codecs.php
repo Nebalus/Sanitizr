@@ -36,12 +36,18 @@ echo "\n=== 2. Price string <-> cents ===\n";
 $priceInCents = S::codec(
     S::string()->regex('/^\d+\.\d{2}$/', 'Must be a price like 19.99'),
     S::integer()->nonNegative(),
-    decode: fn(string $value) => (int) round(((float) $value) * 100),
+    // Integer arithmetic only: a float would lose cents on large amounts.
+    // Past PHP_INT_MAX the result becomes a float, which S::integer() rejects.
+    decode: fn(string $value) => (int) strstr($value, '.', true) * 100 + (int) substr($value, -2),
     encode: fn(int $cents) => sprintf('%d.%02d', intdiv($cents, 100), $cents % 100),
 );
 
 var_dump($priceInCents->decode('19.99'));  // int(1999)
 var_dump($priceInCents->encode(1999));     // string(5) "19.99"
+
+// Amounts that do not fit into an integer are rejected instead of silently going wrong.
+var_dump($priceInCents->safeParse('92233720368547758.07')->getValue());  // int(9223372036854775807)
+echo $priceInCents->safeParse('92233720368547758.08')->getError()->getMessage() . "\n";
 
 // ── 3. ISO date string ↔ DateTimeImmutable ───────────────────────────────────
 
