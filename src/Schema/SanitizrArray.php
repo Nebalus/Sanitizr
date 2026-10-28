@@ -19,6 +19,14 @@ class SanitizrArray extends AbstractSanitizrSchema
     }
 
     /**
+     * Retrieves the schema each array element is validated and parsed with.
+     */
+    public function getItemSchema(): AbstractSanitizrSchema
+    {
+        return $this->schema;
+    }
+
+    /**
      * @throws SanitizrValidationException
      */
     protected function parseValue(mixed $input, string $path = ''): array

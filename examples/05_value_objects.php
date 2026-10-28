@@ -7,7 +7,14 @@ use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
 use Nebalus\Sanitizr\Trait\SanitizrValueObjectTrait;
 
-// 1. Define Value Objects using the Trait
+// 1. Define value objects with the trait.
+//
+// Each class defines its schema once. The trait then provides:
+//   - from() / tryFrom():        parse one input into an instance
+//   - getValueObjectSchema():    the schema, yielding the instance, for use inside larger schemas
+//   - getSchema():               the schema, yielding the plain value
+//   - isValid():                 does an input satisfy the schema
+// An instance is built as `new static($parsedValue)` unless fromParsed() is overridden.
 
 class Email
 {
@@ -21,18 +28,6 @@ class Email
     protected static function defineSchema(): AbstractSanitizrSchema
     {
         return S::string()->email()->toLowerCase();
-    }
-
-    public static function from(string $email): self
-    {
-        $schema = static::getSchema();
-        $validData = $schema->safeParse($email);
-
-        if ($validData->isError()) {
-            throw SanitizrValidationException::fromError($validData->getError());
-        }
-
-        return new self($validData->getValue());
     }
 
     public function asString(): string
@@ -56,18 +51,13 @@ class MessageBody
         return S::object([
             'mime_type' => S::string()->includes('/'), // basic check for mime type format
             'content' => S::string(),
-        ])->transform(function (array $data) {
-            return new self($data['mime_type'], $data['content']);
-        });
+        ]);
     }
 
-    public static function from(array $data): self
+    // The parsed value is an array, so the constructor takes it apart.
+    protected static function fromParsed(mixed $value): static
     {
-        $validData = static::getSchema()->safeParse($data);
-        if ($validData->isError()) {
-            throw SanitizrValidationException::fromError($validData->getError());
-        }
-        return $validData->getValue(); // Value is already transformed to `MessageBody`
+        return new self($value['mime_type'], $value['content']);
     }
 }
 
@@ -95,20 +85,24 @@ class SmtpChannel
             'id' => S::string(),
             'sender_alias' => S::string()->optional()->nullable(),
             'recipients' => S::object([
-                'to' => S::array(Email::getSchema()->transform(fn($e) => Email::from($e))),
-                'bcc' => S::array(Email::getSchema()->transform(fn($e) => Email::from($e)))->optional()->default([]),
-                'cc' => S::array(Email::getSchema()->transform(fn($e) => Email::from($e)))->optional()->default([]),
+                // Each address parses straight into an Email instance.
+                'to' => S::array(Email::getValueObjectSchema()),
+                'bcc' => S::array(Email::getValueObjectSchema())->optional()->default([]),
+                'cc' => S::array(Email::getValueObjectSchema())->optional()->default([]),
             ])
-        ])->transform(function (array $data) {
-            return new self(
-                $data['type'],
-                $data['id'],
-                $data['sender_alias'] ?? null,
-                $data['recipients']['to'],
-                $data['recipients']['bcc'],
-                $data['recipients']['cc']
-            );
-        });
+        ]);
+    }
+
+    protected static function fromParsed(mixed $value): static
+    {
+        return new self(
+            $value['type'],
+            $value['id'],
+            $value['sender_alias'] ?? null,
+            $value['recipients']['to'],
+            $value['recipients']['bcc'],
+            $value['recipients']['cc']
+        );
     }
 }
 
@@ -132,14 +126,17 @@ class SmsChannel
             'id' => S::string(),
             'sender_alias' => S::string()->optional()->nullable(),
             'recipients' => S::array(S::string()), // expecting phone numbers
-        ])->transform(function (array $data) {
-            return new self(
-                $data['type'],
-                $data['id'],
-                $data['sender_alias'] ?? null,
-                $data['recipients']
-            );
-        });
+        ]);
+    }
+
+    protected static function fromParsed(mixed $value): static
+    {
+        return new self(
+            $value['type'],
+            $value['id'],
+            $value['sender_alias'] ?? null,
+            $value['recipients']
+        );
     }
 }
 
@@ -159,32 +156,26 @@ class SendRequest
     protected static function defineSchema(): AbstractSanitizrSchema
     {
         return S::object([
-            'channels' => S::array(S::union(SmtpChannel::getSchema(), SmsChannel::getSchema())),
+            // A union of value-object schemas: each channel comes out as the class that matched.
+            'channels' => S::array(S::union(SmtpChannel::getValueObjectSchema(), SmsChannel::getValueObjectSchema())),
             'message' => S::object([
                 'subject' => S::string(),
-                'body' => S::array(MessageBody::getSchema())
+                'body' => S::array(MessageBody::getValueObjectSchema())
             ])
-        ])->transform(function (array $data) {
-            return new self(
-                $data['channels'],
-                $data['message']['subject'],
-                $data['message']['body']
-            );
-        });
+        ]);
     }
 
-    public static function fromArray(array $data): self
+    protected static function fromParsed(mixed $value): static
     {
-        $validData = static::getSchema()->safeParse($data);
-        if ($validData->isError()) {
-            echo "Error Parsing " . $validData->getError()->getMessage() . "\n";
-            throw SanitizrValidationException::fromError($validData->getError());
-        }
-        return $validData->getValue(); // Value is transformed into SendRequest!
+        return new self(
+            $value['channels'],
+            $value['message']['subject'],
+            $value['message']['body']
+        );
     }
 }
 
-// 2. The mock JSON payload matching the user's example
+// 2. The mock JSON payload
 $jsonPayload = '{
     "channels": [
         {
@@ -221,13 +212,17 @@ $jsonPayload = '{
 // Decode JSON to an associative array
 $inputData = json_decode($jsonPayload, true);
 
-// Parse and validate the structure
+// 3. Parse the whole payload into a SendRequest — every nested value object is built on the way.
 try {
-    $requestDto = SendRequest::fromArray($inputData);
+    $requestDto = SendRequest::from($inputData);
 
-    echo "Payload is VALID and hydrated to Objects!\n\nParsed Data:\n";
+    echo "Payload is VALID and hydrated to objects!\n\nParsed Data:\n";
     print_r($requestDto);
-} catch (Exception $e) {
+} catch (SanitizrValidationException $e) {
     echo "Payload is INVALID.\n";
     echo "Error: " . $e->getMessage() . "\n";
 }
+
+// 4. A single value: from() throws, tryFrom() answers null.
+echo "\n" . Email::from('Alex@Example.com')->asString() . "\n";
+var_dump(Email::tryFrom('not an email'));

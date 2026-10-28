@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.3.0]: https://github.com/Nebalus/Sanitizr/compare/v2.2.1...v2.3.0
 
 
+
+## [2.3.0] - 2026-10-28
+### Added
+- `SanitizrValueObject`: a schema node that yields an instance of a class instead of the parsed value. It wraps the schema that validates and normalises the raw input plus a factory that builds the object, and runs the factory inside `parseValue()` — so the object is produced wherever the node sits (object property, array item, union or tuple member), and the node's own `optional()`, `nullable()` and `default()` are answered before the factory is called.
+- `SanitizrValueObjectTrait::getValueObjectSchema()`: the class's schema wrapped in a `SanitizrValueObject`, for use inside larger schemas (`S::object(['id' => UserId::getValueObjectSchema()])` parses to an array carrying a `UserId`).
+- `SanitizrValueObjectTrait::from()` and `tryFrom()`: parse one input straight into an instance, throwing or answering null on an invalid input.
+- `SanitizrValueObjectTrait::fromParsed()`: the protected hook that builds the instance from the parsed value (`new static($value)` by default), to override when the constructor takes the value apart.
+- `SanitizrArray::getItemSchema()`, matching `SanitizrObject::getPropertySchemas()`.
+
+[2.3.0]: https://github.com/Nebalus/Sanitizr/compare/v2.2.1...v2.3.0
+
+
 ## [2.2.1] - 2026-09-13
 ### Fixed
 - `SanitizrValueObjectTrait` now works when the trait is used by a base class that several value objects extend. Previously `getSchema()` resolved `defineSchema()` with `self::`, which threw "Cannot call abstract method" on an abstract base, and its single static cache slot was shared by every subclass, so whichever subclass was touched first silently decided the schema all the others validated against. The cache is now keyed per concrete class and the schema is resolved late-bound.
