@@ -3,6 +3,7 @@
 namespace Nebalus\Sanitizr\Schema;
 
 use Closure;
+use LogicException;
 use Nebalus\Sanitizr\Error\SanitizrError;
 use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
@@ -305,20 +306,88 @@ abstract class AbstractSanitizrSchema
     public function parse(mixed $input, string $path = ''): mixed
     {
         if ($this->hasCatchValue === false) {
-            return $this->parseOrThrow($input, $path);
+            return $this->run($input, $path, encode: false);
         }
 
         try {
-            return $this->parseOrThrow($input, $path);
+            return $this->run($input, $path, encode: false);
         } catch (SanitizrValidationException $e) {
             return $this->resolveCatchValue($e->getError(), $input);
         }
     }
 
     /**
+     * Alias of {@see parse()}, named for symmetry with {@see encode()}.
+     *
+     * @throws SanitizrValidationException If the input does not satisfy any schema.
+     */
+    public function decode(mixed $input, string $path = ''): mixed
+    {
+        return $this->parse($input, path: $path);
+    }
+
+    /**
+     * Encodes a value of the schema's output type back into its input type; the reverse of {@see parse()}.
+     *
+     * Codecs run their encode function, pipes run their schemas in reverse order, and objects, arrays, tuples
+     * and unions encode each of their elements. Every other schema validates the value as it does when parsing.
+     * A schema with a {@see transform()} cannot be reversed, so encoding through it throws a LogicException.
+     *
+     * @param mixed $value The value to be encoded.
+     * @param string $path The path to the value, used for error reporting.
+     * @return mixed The encoded value.
+     * @throws SanitizrValidationException If the value does not satisfy the schema.
+     * @throws LogicException If the schema, or one inside it, has a transform.
+     */
+    public function encode(mixed $value, string $path = ''): mixed
+    {
+        return $this->run($value, $path, encode: true);
+    }
+
+    /**
+     * Parses the input value and return a SafeParsedData object and will not throw an exception
+     */
+    public function safeParse(mixed $input, string $path = ''): SafeParsedData
+    {
+        try {
+            $result = $this->parse($input, path: $path);
+            return SafeParsedData::from(true, $result, null);
+        } catch (SanitizrValidationException $e) {
+            return SafeParsedData::from(false, null, $e->getError());
+        }
+    }
+
+    /**
+     * Encodes the value and returns a SafeParsedData object instead of throwing on an invalid value.
+     *
+     * @throws LogicException If the schema, or one inside it, has a transform.
+     */
+    public function safeEncode(mixed $value, string $path = ''): SafeParsedData
+    {
+        try {
+            $result = $this->encode($value, path: $path);
+            return SafeParsedData::from(true, $result, null);
+        } catch (SanitizrValidationException $e) {
+            return SafeParsedData::from(false, null, $e->getError());
+        }
+    }
+
+    /**
+     * Parses or encodes a child schema, in the same direction as the schema containing it.
+     *
      * @throws SanitizrValidationException
      */
-    private function parseOrThrow(mixed $input, string $path): mixed
+    protected static function runChild(AbstractSanitizrSchema $child, mixed $input, string $path, bool $encode): mixed
+    {
+        return $encode ? $child->encode($input, path: $path) : $child->parse($input, path: $path);
+    }
+
+    /**
+     * Runs the input through the schema in either direction; see {@see parse()} and {@see encode()}.
+     *
+     * @throws SanitizrValidationException
+     */
+    private function run(mixed $input, string $path, bool $encode): mixed
     {
         if ($this->isNullable && is_null($input)) {
             return null;
@@ -329,7 +398,7 @@ abstract class AbstractSanitizrSchema
         }
 
         try {
-            $parsedValue = $this->parseValue($input, path: $path);
+            $parsedValue = $encode ? $this->encodeValue($input, path: $path) : $this->parseValue($input, path: $path);
 
             foreach ($this->transformQueue as $value) {
                 $parsedValue = $value[0]($parsedValue);
@@ -339,17 +408,11 @@ abstract class AbstractSanitizrSchema
                 $check[0]($parsedValue, $path);
             }
 
-            if ($this->andSchemas !== []) {
-                foreach ($this->andSchemas as $andSchema) {
-                    $andSchema->parse($parsedValue, path: $path);
-                }
+            foreach ($this->andSchemas as $andSchema) {
+                self::runChild($andSchema, $parsedValue, $path, $encode);
             }
 
-            foreach ($this->postTransformQueue as $value) {
-                $parsedValue = $value[0]($parsedValue);
-            }
-
-            return $parsedValue;
+            return $this->applyPostTransforms($parsedValue, $encode);
         } catch (SanitizrValidationException $e) {
             if ($this->orSchemas === []) {
                 throw $e;
@@ -357,7 +420,7 @@ abstract class AbstractSanitizrSchema
 
             foreach ($this->orSchemas as $orSchema) {
                 try {
-                    return $orSchema->parse($input, path: $path);
+                    return self::runChild($orSchema, $input, $path, $encode);
                 } catch (SanitizrValidationException) {
                     // Ignore the exception and try the next schema
                 }
@@ -372,16 +435,36 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
-     * Parses the input value and return a SafeParsedData object and will not throw an exception
+     * Applies the transforms added with {@see transform()}, which only run when parsing.
+     *
+     * @throws LogicException When encoding, since a transform cannot be reversed.
      */
-    public function safeParse(mixed $input, string $path = ''): SafeParsedData
+    private function applyPostTransforms(mixed $value, bool $encode): mixed
     {
-        try {
-            $result = $this->parse($input, path: $path);
-            return SafeParsedData::from(true, $result, null);
-        } catch (SanitizrValidationException $e) {
-            return SafeParsedData::from(false, null, $e->getError());
+        if ($encode && $this->postTransformQueue !== []) {
+            throw new LogicException(
+                "Encountered unidirectional transform during encode: use a codec to make the conversion reversible"
+            );
         }
+
+        foreach ($this->postTransformQueue as $transform) {
+            $value = $transform[0]($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Encodes the value; the counterpart of {@see parseValue()} for {@see encode()}.
+     *
+     * By default, the value is validated exactly as when parsing. Schemas that contain other schemas
+     * override this to encode their children, and codecs to run their encode function.
+     *
+     * @throws SanitizrValidationException
+     */
+    protected function encodeValue(mixed $input, string $path = ''): mixed
+    {
+        return $this->parseValue($input, path: $path);
     }
 
     /**

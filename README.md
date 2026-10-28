@@ -104,6 +104,29 @@ $parsed['contact'];                             // an Email, not a string
 - **Nested objects & arrays:**  
   Compose validators for deeply nested data.
 
+### Codecs
+
+A codec is a conversion that works in both directions. `parse()` (or `decode()`) turns the wire format into
+your types, and `encode()` turns them back. Encoding walks the whole schema, so a codec nested in an object
+or array is reversed as well:
+
+```php
+$isoDatetime = S::codec(
+    S::string(),
+    $dateTimeSchema, // any schema accepting a DateTimeImmutable
+    decode: fn(string $value) => new DateTimeImmutable($value),
+    encode: fn(DateTimeImmutable $value) => $value->format(DATE_ATOM),
+);
+
+$eventSchema = S::object(['startsAt' => $isoDatetime]);
+
+$event = $eventSchema->parse(['startsAt' => '2026-10-28T12:30:00+00:00']); // startsAt is a DateTimeImmutable
+$payload = $eventSchema->encode($event);                                   // startsAt is a string again
+```
+
+Schemas without a codec validate the value as they do when parsing. A `transform()` cannot be reversed, so
+encoding through one throws a `LogicException`.
+
 See the [examples directory](https://github.com/Nebalus/Sanitizr/tree/dev/examples) and [API Reference](https://github.com/Nebalus/Sanitizr/wiki) for more details.
 
 ## Credits

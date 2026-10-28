@@ -32,9 +32,27 @@ class SanitizrUnion extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $path = ''): mixed
     {
+        return $this->walk($input, $path, encode: false);
+    }
+
+    /**
+     * Encodes the value with the first schema that accepts it; see {@see parseValue()}.
+     *
+     * @throws SanitizrValidationException
+     */
+    protected function encodeValue(mixed $input, string $path = ''): mixed
+    {
+        return $this->walk($input, $path, encode: true);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function walk(mixed $input, string $path, bool $encode): mixed
+    {
         foreach ($this->schemas as $schema) {
             try {
-                return $schema->parse($input, path: $path);
+                return self::runChild($schema, $input, $path, $encode);
             } catch (SanitizrValidationException) {
                 // If it fails, we simply continue to the next schema.
                 continue;

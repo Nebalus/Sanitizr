@@ -46,4 +46,17 @@ class SanitizrPipe extends AbstractSanitizrSchema
     {
         return $this->out->parse($this->in->parse($input, path: $path), path: $path);
     }
+
+    /**
+     * Encodes the value with the second schema, then encodes its result with the first: the reverse of parsing.
+     *
+     * @param mixed $input The value to be encoded.
+     * @param string $path The path to the value, used for error reporting.
+     * @return mixed The value produced by the first schema.
+     * @throws SanitizrValidationException If either schema rejects its input.
+     */
+    protected function encodeValue(mixed $input, string $path = ''): mixed
+    {
+        return $this->in->encode($this->out->encode($input, path: $path), path: $path);
+    }
 }

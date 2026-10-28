@@ -42,6 +42,24 @@ class SanitizrObject extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $path = ''): array
     {
+        return $this->walk($input, $path, encode: false);
+    }
+
+    /**
+     * Encodes every property with its schema; see {@see parseValue()}.
+     *
+     * @throws SanitizrValidationException If the value is not an object/associative array or any properties fail validation.
+     */
+    protected function encodeValue(mixed $input, string $path = ''): array
+    {
+        return $this->walk($input, $path, encode: true);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function walk(mixed $input, string $path, bool $encode): array
+    {
         if (is_object($input)) {
             $input = get_object_vars($input);
         }
@@ -82,10 +100,7 @@ class SanitizrObject extends AbstractSanitizrSchema
                 }
 
                 try {
-                    $result[$prop] = $schema->parse(
-                        $input[$prop] ?? null,
-                        path: $updatedPath
-                    );
+                    $result[$prop] = self::runChild($schema, $input[$prop] ?? null, $updatedPath, $encode);
                 } catch (SanitizrValidationException $e) {
                     $collectedErrors->merge($e->getError());
                 }
