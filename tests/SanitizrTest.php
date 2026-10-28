@@ -45,6 +45,15 @@ class SanitizrTest extends TestCase
         $this->assertInstanceOf(SanitizrString::class, $this->sanitizr->string());
     }
 
+    public function testEmail(): void
+    {
+        $schema = $this->sanitizr->email('Bad email');
+
+        $this->assertInstanceOf(SanitizrString::class, $schema);
+        $this->assertTrue($schema->safeParse('user@example.com')->isValid());
+        $this->assertSame('Bad email', $schema->safeParse('not an email')->getError()->getMessage());
+    }
+
     public function testFloat(): void
     {
         $this->assertInstanceOf(SanitizrNumber::class, $this->sanitizr->float());

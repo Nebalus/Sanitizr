@@ -42,6 +42,24 @@ class SanitizrObject extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $path = ''): array
     {
+        return $this->walk($input, $path, encode: false);
+    }
+
+    /**
+     * Encodes every property with its schema; see {@see parseValue()}.
+     *
+     * @throws SanitizrValidationException If the value is not an object/associative array or any properties fail validation.
+     */
+    protected function encodeValue(mixed $input, string $path = ''): array
+    {
+        return $this->walk($input, $path, encode: true);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function walk(mixed $input, string $path, bool $encode): array
+    {
         if (is_object($input)) {
             $input = get_object_vars($input);
         }
@@ -69,13 +87,11 @@ class SanitizrObject extends AbstractSanitizrSchema
                 }
 
                 if ($schema->isOptional() === false && array_key_exists($prop, $input) === false) {
-                    $collectedErrors->addIssue(new SanitizrIssue(
-                        code: SanitizrIssue::MISSING_KEY,
-                        path: self::pathToArray($updatedPath),
-                        message: "Required",
-                        expected: 'defined',
-                        received: 'undefined',
-                    ));
+                    try {
+                        $result[$prop] = self::parseMissingKey($schema, $updatedPath);
+                    } catch (SanitizrValidationException $e) {
+                        $collectedErrors->merge($e->getError());
+                    }
                     continue;
                 }
 
@@ -84,19 +100,7 @@ class SanitizrObject extends AbstractSanitizrSchema
                 }
 
                 try {
-                    if ($schema instanceof SanitizrObject) {
-                        if (array_key_exists($prop, $input)) {
-                            $result[$prop] = $schema->parseValue(
-                                $input[$prop],
-                                path: $updatedPath
-                            );
-                        }
-                    } else {
-                        $result[$prop] = $schema->parse(
-                            $input[$prop] ?? null,
-                            path: $updatedPath
-                        );
-                    }
+                    $result[$prop] = self::runChild($schema, $input[$prop] ?? null, $updatedPath, $encode);
                 } catch (SanitizrValidationException $e) {
                     $collectedErrors->merge($e->getError());
                 }

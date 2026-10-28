@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [2.3.0] - 2026-10-28
+### Added
+- Codecs: `S::codec($in, $out, decode: ..., encode: ...)` returns a `SanitizrCodec`, a conversion that works in both directions. Parsing validates the input with `$in`, converts it with `decode` and validates the result with `$out`; encoding runs the other way round.
+- `encode()`, `safeEncode()` and `decode()` (an alias of `parse()`) on every schema. Encoding walks the whole schema: objects, arrays, tuples and unions encode their elements, pipes run in reverse and codecs run their encode function, while every other schema validates the value as it does when parsing. Encoding through a `transform()` or a `SanitizrValueObject` throws a `LogicException`, since neither can be reversed.
+- `encodeValue()`: the protected counterpart of `parseValue()` for custom schemas; it validates as `parseValue()` by default.
+- Pipes: `$schema->pipe($other)` and `S::pipe($in, $out)` return a `SanitizrPipe` that parses the input with the first schema and then parses its result (after transforms) with the second, e.g. `S::string()->transform(intval(...))->pipe(S::number()->gt(0))`. Modifiers such as `optional()`, `nullable()`, `default()` and `transform()` apply to the pipe as a whole.
+- `catch(mixed $value)` on every schema: returns the given fallback instead of failing when the input does not satisfy the schema (after any `or()` fallbacks). A `Closure` is called with the `SanitizrError` and the original input to compute the fallback; any other value is returned as it is. Inside an object or tuple schema a missing key is caught as well, so `S::object(['role' => S::string()->catch('user')])` parses `[]` to `['role' => 'user']`.
+- `hasCatchValue()` on every schema.
+- `S::email()` (and `Sanitizr::email()`): shorthand for `S::string()->email()`, taking the same optional custom error message.
+- `SanitizrValueObject`: a schema node that yields an instance of a class instead of the parsed value. It wraps the schema that validates and normalises the raw input plus a factory that builds the object, and runs the factory inside `parseValue()` — so the object is produced wherever the node sits (object property, array item, union or tuple member), and the node's own `optional()`, `nullable()` and `default()` are answered before the factory is called.
+- `SanitizrValueObjectTrait::getValueObjectSchema()`: the class's schema wrapped in a `SanitizrValueObject`, for use inside larger schemas (`S::object(['id' => UserId::getValueObjectSchema()])` parses to an array carrying a `UserId`).
+- `SanitizrValueObjectTrait::from()` and `tryFrom()`: parse one input straight into an instance, throwing or answering null on an invalid input.
+- `SanitizrValueObjectTrait::fromParsed()`: the protected hook that builds the instance from the parsed value (`new static($value)` by default), to override when the constructor takes the value apart.
+- `SanitizrArray::getItemSchema()`, matching `SanitizrObject::getPropertySchemas()`.
+- Examples `08_pipes.php` and `09_codecs.php`.
+
+### Changed
+- README rewritten: quick start, a reference for every schema and modifier, pipes, codecs, value objects, error handling, custom schemas, the examples and development setup. The old example used `S::int()` and `->min()` on a number, neither of which exists.
+- `AbstractSanitizrSchema` has new public methods (`catch()`, `hasCatchValue()`, `pipe()`, `encode()`, `decode()`, `safeEncode()`) and new protected ones (`encodeValue()`, `runChild()`, `resolveCatchValue()`, `parseMissingKey()`). A custom schema that already declares a method of the same name with a different signature has to rename it.
+- `SanitizrValueObjectTrait` has new methods (`from()`, `tryFrom()`, `getValueObjectSchema()`, `fromParsed()`). A subclass of a class using the trait that declares one of them with an incompatible signature has to rename it.
+
+### Fixed
+- An object schema used as a property of another object schema is now parsed in full. `SanitizrObject` used to call the nested schema's `parseValue()` directly, which skipped its `transform()`, `nullable()`, `default()`, checks and `and()`/`or()`, so a value object's schema used as a property (`S::object(['address' => Address::getSchema()])`) returned the raw array instead of the instance. Wrapping the schema in `S::union()` only hid the problem. Code that relied on those modifiers being ignored on nested objects now sees them applied.
+
+[2.3.0]: https://github.com/Nebalus/Sanitizr/compare/v2.2.1...v2.3.0
+
+
 ## [2.2.1] - 2026-09-13
 ### Fixed
 - `SanitizrValueObjectTrait` now works when the trait is used by a base class that several value objects extend. Previously `getSchema()` resolved `defineSchema()` with `self::`, which threw "Cannot call abstract method" on an abstract base, and its single static cache slot was shared by every subclass, so whichever subclass was touched first silently decided the schema all the others validated against. The cache is now keyed per concrete class and the schema is resolved late-bound.

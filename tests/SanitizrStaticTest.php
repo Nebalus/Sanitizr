@@ -38,6 +38,24 @@ class SanitizrStaticTest extends TestCase
         $this->assertInstanceOf(SanitizrString::class, S::string());
     }
 
+    public function testEmail(): void
+    {
+        $schema = S::email();
+
+        $this->assertInstanceOf(SanitizrString::class, $schema);
+        $this->assertTrue($schema->safeParse('user@example.com')->isValid());
+        $this->assertFalse($schema->safeParse('not an email')->isValid());
+        $this->assertFalse($schema->safeParse(123)->isValid());
+    }
+
+    public function testEmailCanBeChained(): void
+    {
+        $schema = S::email()->endsWith('@example.com');
+
+        $this->assertTrue($schema->safeParse('user@example.com')->isValid());
+        $this->assertFalse($schema->safeParse('user@other.com')->isValid());
+    }
+
     public function testFloat(): void
     {
         $this->assertInstanceOf(SanitizrNumber::class, S::float());

@@ -28,6 +28,24 @@ class SanitizrTuple extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $path = ''): array
     {
+        return $this->walk($input, $path, encode: false);
+    }
+
+    /**
+     * Encodes every element with the schema at its position; see {@see parseValue()}.
+     *
+     * @throws SanitizrValidationException
+     */
+    protected function encodeValue(mixed $input, string $path = ''): array
+    {
+        return $this->walk($input, $path, encode: true);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function walk(mixed $input, string $path, bool $encode): array
+    {
         if (! is_array($input)) {
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
@@ -45,24 +63,13 @@ class SanitizrTuple extends AbstractSanitizrSchema
         foreach ($this->schemas as $schema) {
             $updatedPath = $path === '' ? "KEY" . $iterator : $path . ".KEY" . $iterator;
 
-            if ($schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false) {
-                $collectedErrors->addIssue(new SanitizrIssue(
-                    code: SanitizrIssue::MISSING_KEY,
-                    path: self::pathToArray($updatedPath),
-                    message: "Required",
-                    expected: 'defined',
-                    received: 'undefined',
-                ));
-                $iterator++;
-                continue;
-            }
+            $isMissing = $schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false;
 
             try {
                 $currentValue = $input[$iterator] ?? null;
-                $result[] = $schema->parse(
-                    $currentValue,
-                    path: $updatedPath
-                );
+                $result[] = $isMissing
+                    ? self::parseMissingKey($schema, $updatedPath)
+                    : self::runChild($schema, $currentValue, $updatedPath, $encode);
             } catch (SanitizrValidationException $e) {
                 $collectedErrors->merge($e->getError());
             }
