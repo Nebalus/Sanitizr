@@ -37,7 +37,7 @@ use Nebalus\Sanitizr\SanitizrStatic as S;
 // Define a schema
 $userSchema = S::object([
     'name' => S::string()->min(1),
-    'email' => S::string()->email(),
+    'email' => S::email(),
     'age' => S::int()->min(0)->optional(),
 ]);
 

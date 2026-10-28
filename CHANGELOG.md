@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - An object schema used as a property of another object schema is now parsed in full. `SanitizrObject` used to call the nested schema's `parseValue()` directly, which skipped its `transform()`, `nullable()`, `default()`, checks and `and()`/`or()`, so a value object's schema used as a property (`S::object(['address' => Address::getSchema()])`) returned the raw array instead of the instance. Wrapping the schema in `S::union()` only hid the problem.
 
+
+## [2.3.0] - 2026-10-28
+### Added
+- `S::email()` (and `Sanitizr::email()`): shorthand for `S::string()->email()`, taking the same optional custom error message.
+
+[2.3.0]: https://github.com/Nebalus/Sanitizr/compare/v2.2.1...v2.3.0
+
+
 ## [2.2.1] - 2026-09-13
 ### Fixed
 - `SanitizrValueObjectTrait` now works when the trait is used by a base class that several value objects extend. Previously `getSchema()` resolved `defineSchema()` with `self::`, which threw "Cannot call abstract method" on an abstract base, and its single static cache slot was shared by every subclass, so whichever subclass was touched first silently decided the schema all the others validated against. The cache is now keyed per concrete class and the schema is resolved late-bound.
