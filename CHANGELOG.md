@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+### Added
+- Pipes: `$schema->pipe($other)` and `S::pipe($in, $out)` return a `SanitizrPipe` that parses the input with the first schema and then parses its result (after transforms) with the second, e.g. `S::string()->transform(intval(...))->pipe(S::number()->gt(0))`. Modifiers such as `optional()`, `nullable()`, `default()` and `transform()` apply to the pipe as a whole.
 
 ## [2.2.1] - 2026-09-13
 ### Fixed
