@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Codecs: `S::codec($in, $out, decode: ..., encode: ...)` returns a `SanitizrCodec`, a conversion that works in both directions. Parsing validates the input with `$in`, converts it with `decode` and validates the result with `$out`; encoding runs the other way round.
+- `encode()`, `safeEncode()` and `decode()` (an alias of `parse()`) on every schema. Encoding walks the whole schema: objects, arrays, tuples and unions encode their elements, pipes run in reverse and codecs run their encode function, while every other schema validates the value as it does when parsing. Encoding through a `transform()` throws a `LogicException`, since a transform cannot be reversed.
+- `encodeValue()`: the protected counterpart of `parseValue()` for custom schemas; it validates as `parseValue()` by default.
 - Pipes: `$schema->pipe($other)` and `S::pipe($in, $out)` return a `SanitizrPipe` that parses the input with the first schema and then parses its result (after transforms) with the second, e.g. `S::string()->transform(intval(...))->pipe(S::number()->gt(0))`. Modifiers such as `optional()`, `nullable()`, `default()` and `transform()` apply to the pipe as a whole.
 
 ## [2.2.1] - 2026-09-13

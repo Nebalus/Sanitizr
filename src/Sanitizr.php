@@ -7,6 +7,7 @@ use Nebalus\Sanitizr\Schema\Primitive\SanitizrBoolean;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrNumber;
 use Nebalus\Sanitizr\Schema\Primitive\SanitizrString;
 use Nebalus\Sanitizr\Schema\SanitizrArray;
+use Nebalus\Sanitizr\Schema\SanitizrCodec;
 use Nebalus\Sanitizr\Schema\SanitizrEnum;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
@@ -210,5 +211,26 @@ class Sanitizr
     public function pipe(AbstractSanitizrSchema $in, AbstractSanitizrSchema $out): SanitizrPipe
     {
         return new SanitizrPipe($in, $out);
+    }
+
+    /**
+     * Creates a codec: a reversible conversion between the input type of one schema and the output type of another.
+     *
+     * Parsing (or decoding) validates the input with `$in`, converts it with `$decode` and validates the result
+     * with `$out`; encoding runs the other way round with `$encode`.
+     *
+     * @param AbstractSanitizrSchema $in The schema of the encoded form, e.g. an ISO date string.
+     * @param AbstractSanitizrSchema $out The schema of the decoded form, e.g. a date object.
+     * @param callable $decode Converts a value accepted by `$in` into one for `$out`.
+     * @param callable $encode Converts a value accepted by `$out` back into one for `$in`.
+     * @return SanitizrCodec The codec schema.
+     */
+    public function codec(
+        AbstractSanitizrSchema $in,
+        AbstractSanitizrSchema $out,
+        callable $decode,
+        callable $encode,
+    ): SanitizrCodec {
+        return new SanitizrCodec($in, $out, $decode, $encode);
     }
 }

@@ -23,6 +23,24 @@ class SanitizrArray extends AbstractSanitizrSchema
      */
     protected function parseValue(mixed $input, string $path = ''): array
     {
+        return $this->walk($input, $path, encode: false);
+    }
+
+    /**
+     * Encodes every element with the item schema; see {@see parseValue()}.
+     *
+     * @throws SanitizrValidationException
+     */
+    protected function encodeValue(mixed $input, string $path = ''): array
+    {
+        return $this->walk($input, $path, encode: true);
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function walk(mixed $input, string $path, bool $encode): array
+    {
         if (! is_array($input)) {
             throw SanitizrValidationException::fromIssue(new SanitizrIssue(
                 code: SanitizrIssue::INVALID_TYPE,
@@ -39,7 +57,7 @@ class SanitizrArray extends AbstractSanitizrSchema
         foreach ($input as $index => $v) {
             $updatedPath = $path === '' ? (string) $index : $path . '.' . $index;
             try {
-                $result[] = $this->schema->parse($v, path: $updatedPath);
+                $result[] = self::runChild($this->schema, $v, $updatedPath, $encode);
             } catch (SanitizrValidationException $e) {
                 $collectedErrors->merge($e->getError());
             }
