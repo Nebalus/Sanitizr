@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+### Fixed
+- An object schema used as a property of another object schema is now parsed in full. `SanitizrObject` used to call the nested schema's `parseValue()` directly, which skipped its `transform()`, `nullable()`, `default()`, checks and `and()`/`or()`, so a value object's schema used as a property (`S::object(['address' => Address::getSchema()])`) returned the raw array instead of the instance. Wrapping the schema in `S::union()` only hid the problem.
 
 ## [2.2.1] - 2026-09-13
 ### Fixed
