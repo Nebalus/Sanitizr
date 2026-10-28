@@ -94,4 +94,21 @@ class SanitizrValueObjectTest extends TestCase
         $this->expectException(LogicException::class);
         $schema->parse('x');
     }
+
+    /** The factory has no inverse, so encoding through it is a programming error, as with a transform. */
+    public function testCannotBeEncoded(): void
+    {
+        $schema = S::object(['id' => UserId::getValueObjectSchema()]);
+        $parsed = $schema->parse(['id' => self::UUID]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(UserId::class);
+
+        $schema->encode($parsed);
+    }
+
+    public function testNullIsStillEncodedWhenNullable(): void
+    {
+        $this->assertNull(UserId::getValueObjectSchema()->nullable()->encode(null));
+    }
 }

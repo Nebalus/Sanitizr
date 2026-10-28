@@ -68,4 +68,17 @@ final class SanitizrValueObject extends AbstractSanitizrSchema
 
         return $object;
     }
+
+    /**
+     * A value object cannot be encoded: the factory has no inverse, just like a transform.
+     *
+     * @throws LogicException Always.
+     */
+    protected function encodeValue(mixed $input, string $path = ''): never
+    {
+        throw new LogicException(sprintf(
+            'Encountered unidirectional value object %s during encode: use a codec to make the conversion reversible',
+            $this->class,
+        ));
+    }
 }
