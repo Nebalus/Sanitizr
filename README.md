@@ -231,9 +231,10 @@ $data = $order->decode($request);  // prices are integers
 $json = $order->encode($data);     // prices are strings again
 ```
 
-Schemas without a codec just validate the value when encoding. A `transform()` or a value object schema cannot be
-reversed, so encoding through one throws a `LogicException`; use a codec when a conversion has to work both ways.
-`safeEncode()` is the non-throwing variant.
+Schemas without a codec validate the value when encoding, and still apply their sanitizing steps such as `trim()`
+or `toLowerCase()`, so `S::string()->trim()->encode('  abc ')` returns `'abc'`. A `transform()` or a value object
+schema cannot be reversed, so encoding through one throws a `LogicException`; use a codec when a conversion has to
+work both ways. `safeEncode()` is the non-throwing variant.
 
 ## Value Objects
 
