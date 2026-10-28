@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace UnitTesting\Trait;
 
+use Nebalus\Sanitizr\SanitizrStatic as S;
 use PHPUnit\Framework\TestCase;
+use UnitTesting\Trait\Fixture\Address;
 use UnitTesting\Trait\Fixture\BuildCounter;
 use UnitTesting\Trait\Fixture\FlatEmail;
 use UnitTesting\Trait\Fixture\LowerCaseValue;
@@ -56,5 +58,26 @@ class SanitizrValueObjectTraitTest extends TestCase
     public function testSubclassSchemasAreCachedSeparately(): void
     {
         $this->assertNotEquals(LowerCaseValue::getSchema(), UpperCaseValue::getSchema());
+    }
+
+    /**
+     * An object schema used as a property of another object schema must go
+     * through the full parse, or the transform that builds the instance is skipped.
+     */
+    public function testObjectSchemaAsPropertyYieldsTheInstance(): void
+    {
+        $result = S::object(['address' => Address::getSchema()])
+            ->parse(['address' => ['city' => 'Berlin', 'zip' => '10115']]);
+
+        $this->assertInstanceOf(Address::class, $result['address']);
+        $this->assertSame('Berlin', $result['address']->city);
+    }
+
+    public function testObjectSchemaInsideUnionYieldsTheInstance(): void
+    {
+        $result = S::object(['address' => S::union(Address::getSchema(), S::string())])
+            ->parse(['address' => ['city' => 'Berlin', 'zip' => '10115']]);
+
+        $this->assertInstanceOf(Address::class, $result['address']);
     }
 }

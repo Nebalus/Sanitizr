@@ -84,19 +84,10 @@ class SanitizrObject extends AbstractSanitizrSchema
                 }
 
                 try {
-                    if ($schema instanceof SanitizrObject) {
-                        if (array_key_exists($prop, $input)) {
-                            $result[$prop] = $schema->parseValue(
-                                $input[$prop],
-                                path: $updatedPath
-                            );
-                        }
-                    } else {
-                        $result[$prop] = $schema->parse(
-                            $input[$prop] ?? null,
-                            path: $updatedPath
-                        );
-                    }
+                    $result[$prop] = $schema->parse(
+                        $input[$prop] ?? null,
+                        path: $updatedPath
+                    );
                 } catch (SanitizrValidationException $e) {
                     $collectedErrors->merge($e->getError());
                 }
