@@ -150,8 +150,12 @@ does not define are dropped. A missing key fails with `missing_key` unless its s
 
 ```php
 S::array(S::string())->min(1)->max(10);  // also: between(), notEmpty(), empty()
-S::tuple(S::number(), S::number());       // fixed length, one schema per position
+S::tuple(S::number(), S::number());       // one schema per position
 ```
+
+A tuple parses only the positions it defines. A missing position fails with `missing_key`, but extra elements
+are not rejected: they are dropped, so `[1, 2, 3]` parses to `[1, 2]`. To reject them, check the length of the
+raw input first: `S::array(S::number())->max(2)->pipe(S::tuple(S::number(), S::number()))`.
 
 ### Unions
 
