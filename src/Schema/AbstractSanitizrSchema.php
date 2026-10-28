@@ -2,6 +2,8 @@
 
 namespace Nebalus\Sanitizr\Schema;
 
+use Closure;
+use Nebalus\Sanitizr\Error\SanitizrError;
 use Nebalus\Sanitizr\Error\SanitizrIssue;
 use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Value\SafeParsedData;
@@ -17,6 +19,9 @@ abstract class AbstractSanitizrSchema
 
     private bool $hasDefaultValue = false;
     private mixed $defaultValue;
+
+    private bool $hasCatchValue = false;
+    private mixed $catchValue;
 
     private ?array $orSchemas = [];
     private ?array $andSchemas = [];
@@ -109,6 +114,24 @@ abstract class AbstractSanitizrSchema
         return $newSchema;
     }
 
+    /**
+     * Sets a fallback value that is returned instead of failing when the input does not satisfy the schema.
+     *
+     * Pass a Closure to compute the fallback; it is called with the validation error and the original input:
+     * `fn(SanitizrError $error, mixed $input): mixed`. Any other value, including a callable string, is
+     * returned as it is. Within an object schema, a missing key is caught as well.
+     *
+     * @param mixed $value The fallback value, or a Closure producing it.
+     * @return static
+     */
+    public function catch(mixed $value): static
+    {
+        $newSchema = clone $this;
+        $newSchema->hasCatchValue = true;
+        $newSchema->catchValue = $value;
+        return $newSchema;
+    }
+
     public function or(AbstractSanitizrSchema $orSanitizerSchema): static
     {
         $newSchema = clone $this;
@@ -190,6 +213,55 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Determines whether a catch value is set for the schema.
+     *
+     * @return bool True if a catch value is defined; otherwise, false.
+     */
+    public function hasCatchValue(): bool
+    {
+        return $this->hasCatchValue;
+    }
+
+    /**
+     * Resolves the catch value for a failed input, calling it first if it is a Closure.
+     *
+     * @param SanitizrError $error The error the input failed with.
+     * @param mixed $input The input that failed.
+     * @return mixed The fallback value.
+     */
+    protected function resolveCatchValue(SanitizrError $error, mixed $input): mixed
+    {
+        return $this->catchValue instanceof Closure
+            ? ($this->catchValue)($error, $input)
+            : $this->catchValue;
+    }
+
+    /**
+     * Answers a required key that is missing from an object or tuple: the schema's catch value, if it has one.
+     *
+     * @param AbstractSanitizrSchema $schema The schema of the missing key.
+     * @param string $path The path to the missing key.
+     * @return mixed The catch value of the schema.
+     * @throws SanitizrValidationException With a missing_key issue if the schema has no catch value.
+     */
+    protected static function parseMissingKey(AbstractSanitizrSchema $schema, string $path): mixed
+    {
+        $issue = new SanitizrIssue(
+            code: SanitizrIssue::MISSING_KEY,
+            path: self::pathToArray($path),
+            message: "Required",
+            expected: 'defined',
+            received: 'undefined',
+        );
+
+        if ($schema->hasCatchValue() === false) {
+            throw SanitizrValidationException::fromIssue($issue);
+        }
+
+        return $schema->resolveCatchValue(new SanitizrError($issue), null);
+    }
+
+    /**
      * Converts a dot-separated path string to a path array.
      *
      * @param string $path Dot-separated path (e.g. "user.address.zip")
@@ -208,14 +280,31 @@ abstract class AbstractSanitizrSchema
      * Otherwise, parses the input, applies all registered transformations and validation checks,
      * and enforces all "and" schemas. If validation fails and "or" schemas are defined,
      * attempts to parse the input with each "or" schema until one succeeds.
-     * Throws a SanitizrValidationException if no schema validates the input.
+     * Throws a SanitizrValidationException if no schema validates the input,
+     * unless a catch value is set, in which case that value is returned instead.
      *
      * @param mixed $input The value to be parsed and validated.
      * @param string $path The path to the value, used for error reporting.
-     * @return mixed The parsed and validated value, or null/default if applicable.
+     * @return mixed The parsed and validated value, or null/default/catch value if applicable.
      * @throws SanitizrValidationException If the input does not satisfy any schema.
      */
     public function parse(mixed $input, string $path = ''): mixed
+    {
+        if ($this->hasCatchValue === false) {
+            return $this->parseOrThrow($input, $path);
+        }
+
+        try {
+            return $this->parseOrThrow($input, $path);
+        } catch (SanitizrValidationException $e) {
+            return $this->resolveCatchValue($e->getError(), $input);
+        }
+    }
+
+    /**
+     * @throws SanitizrValidationException
+     */
+    private function parseOrThrow(mixed $input, string $path): mixed
     {
         if ($this->isNullable && is_null($input)) {
             return null;

@@ -69,13 +69,11 @@ class SanitizrObject extends AbstractSanitizrSchema
                 }
 
                 if ($schema->isOptional() === false && array_key_exists($prop, $input) === false) {
-                    $collectedErrors->addIssue(new SanitizrIssue(
-                        code: SanitizrIssue::MISSING_KEY,
-                        path: self::pathToArray($updatedPath),
-                        message: "Required",
-                        expected: 'defined',
-                        received: 'undefined',
-                    ));
+                    try {
+                        $result[$prop] = self::parseMissingKey($schema, $updatedPath);
+                    } catch (SanitizrValidationException $e) {
+                        $collectedErrors->merge($e->getError());
+                    }
                     continue;
                 }
 
