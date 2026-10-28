@@ -58,8 +58,10 @@ if ($result->isValid()) {
 }
 ```
 
-`parse()` returns the value or throws a `SanitizrValidationException`; `safeParse()` never throws and returns a
-`SafeParsedData` with `isValid()`, `getValue()` and `getError()`.
+`parse()` returns the value or throws a `SanitizrValidationException`; `safeParse()` returns a `SafeParsedData`
+with `isValid()`, `getValue()` and `getError()` instead. It only catches `SanitizrValidationException`, though:
+anything else thrown by your own `transform()` or codec callbacks (e.g. `new DateTimeImmutable($v)` on a bad date)
+still propagates. Throw a `SanitizrValidationException` from a callback to report bad input as a validation error.
 
 ### Static or instance API
 
@@ -239,7 +241,8 @@ $json = $order->encode($data);     // prices are strings again
 Schemas without a codec validate the value when encoding, and still apply their sanitizing steps such as `trim()`
 or `toLowerCase()`, so `S::string()->trim()->encode('  abc ')` returns `'abc'`. A `transform()` or a value object
 schema cannot be reversed, so encoding through one throws a `LogicException`; use a codec when a conversion has to
-work both ways. `safeEncode()` is the non-throwing variant.
+work both ways. `safeEncode()` returns invalid values as a `SafeParsedData` like `safeParse()` does, but that
+`LogicException` and exceptions from your own callbacks still propagate.
 
 ## Value Objects
 
