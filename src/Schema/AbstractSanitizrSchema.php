@@ -161,6 +161,20 @@ abstract class AbstractSanitizrSchema
     }
 
     /**
+     * Pipes the output of this schema into another schema.
+     *
+     * The input is parsed with this schema first; its result, after any transforms, is then parsed with
+     * the given schema. Useful to validate a value again once it has been transformed into another type.
+     *
+     * @param AbstractSanitizrSchema $schema The schema that parses the output of this schema.
+     * @return SanitizrPipe The pipe schema.
+     */
+    public function pipe(AbstractSanitizrSchema $schema): SanitizrPipe
+    {
+        return new SanitizrPipe($this, $schema);
+    }
+
+    /**
      * Returns whether the schema is marked as optional.
      *
      * This is relevant when the schema is used as a property within an object schema, indicating that the field may be omitted without causing validation to fail.

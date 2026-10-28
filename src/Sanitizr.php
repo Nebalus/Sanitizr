@@ -11,6 +11,7 @@ use Nebalus\Sanitizr\Schema\SanitizrEnum;
 use Nebalus\Sanitizr\Schema\SanitizrLiteral;
 use Nebalus\Sanitizr\Schema\SanitizrNull;
 use Nebalus\Sanitizr\Schema\SanitizrObject;
+use Nebalus\Sanitizr\Schema\SanitizrPipe;
 use Nebalus\Sanitizr\Schema\SanitizrTuple;
 use Nebalus\Sanitizr\Schema\Union\SanitizrUnion;
 
@@ -209,5 +210,19 @@ class Sanitizr
     public function union(AbstractSanitizrSchema ...$schemas): SanitizrUnion
     {
         return new SanitizrUnion(...$schemas);
+    }
+
+    /**
+     * Creates a pipe schema that parses the input with one schema and its result with another.
+     *
+     * Equivalent to `$in->pipe($out)`.
+     *
+     * @param AbstractSanitizrSchema $in The schema the raw input is parsed with first.
+     * @param AbstractSanitizrSchema $out The schema the output of the first schema is parsed with.
+     * @return SanitizrPipe The pipe schema.
+     */
+    public function pipe(AbstractSanitizrSchema $in, AbstractSanitizrSchema $out): SanitizrPipe
+    {
+        return new SanitizrPipe($in, $out);
     }
 }
