@@ -2,8 +2,26 @@
 
 namespace Nebalus\Sanitizr\Trait;
 
+use Nebalus\Sanitizr\Exception\SanitizrValidationException;
 use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Schema\SanitizrValueObject;
 
+/**
+ * Gives a value object a schema and the constructors that go with it.
+ *
+ * The using class defines {@see defineSchema()} — how a raw input is validated
+ * and normalised — and gets:
+ *
+ * - {@see getSchema()}: that schema, yielding the normalised *value*.
+ * - {@see getValueObjectSchema()}: the same schema wrapped so that it yields
+ *   the *instance*. Put it in a larger schema (`S::object(['id' => UserId::getValueObjectSchema()])`)
+ *   and the parsed result carries a `UserId` where the input carried a string.
+ * - {@see from()} / {@see tryFrom()}: parse one input straight into an instance.
+ * - {@see isValid()}: does an input satisfy the schema at all.
+ *
+ * By default an instance is built as `new static($parsedValue)`; a class whose
+ * constructor takes something else overrides {@see fromParsed()}.
+ */
 trait SanitizrValueObjectTrait
 {
     /**
@@ -35,6 +53,42 @@ trait SanitizrValueObjectTrait
     }
 
     /**
+     * Returns the schema wrapped so that parsing yields an instance of this class.
+     *
+     * The wrapper parses through {@see getSchema()} and then calls
+     * {@see fromParsed()}, so validation, normalisation and error paths are
+     * exactly those of the plain schema; only the result differs. The wrapper's
+     * own `optional()`, `nullable()` and `default()` apply before construction,
+     * so an absent or null field stays absent or null.
+     *
+     * Call this on a concrete class: an abstract base cannot be instantiated.
+     */
+    public static function getValueObjectSchema(): SanitizrValueObject
+    {
+        return new SanitizrValueObject(static::class, static::getSchema(), static::fromParsed(...));
+    }
+
+    /**
+     * Parses the input and returns it as an instance of this class.
+     *
+     * @throws SanitizrValidationException If the input does not satisfy the schema.
+     */
+    public static function from(mixed $value): static
+    {
+        return static::getValueObjectSchema()->parse($value);
+    }
+
+    /**
+     * Like {@see from()}, but answers null instead of throwing for an invalid input.
+     */
+    public static function tryFrom(mixed $value): ?static
+    {
+        $parsed = static::getValueObjectSchema()->safeParse($value);
+
+        return $parsed->isValid() ? $parsed->getValue() : null;
+    }
+
+    /**
      * Checks whether the given value satisfies the schema of this value object.
      *
      * Only the validity of the input is reported; any exception thrown while building
@@ -47,6 +101,21 @@ trait SanitizrValueObjectTrait
     public static function isValid(mixed $value): bool
     {
         return static::getSchema()->safeParse($value)->isValid();
+    }
+
+    /**
+     * Builds the instance from a value the schema has already accepted.
+     *
+     * The default hands the parsed value to the constructor as its single
+     * argument, which fits a class wrapping one scalar. Override it when the
+     * constructor wants the value taken apart — an object schema yielding an
+     * array, say — and keep it protected: the schema is the only door in.
+     *
+     * @param mixed $value The parsed, normalised value.
+     */
+    protected static function fromParsed(mixed $value): static
+    {
+        return new static($value);
     }
 
     abstract protected static function defineSchema(): AbstractSanitizrSchema;

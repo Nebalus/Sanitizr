@@ -60,6 +60,43 @@ if ($result->isValid()) {
 }
 ```
 
+### Value Objects
+
+Give a class a schema with `SanitizrValueObjectTrait`, and it gains constructors that parse straight into an instance — and a schema that yields the instance when used inside a larger one:
+
+```php
+use Nebalus\Sanitizr\SanitizrStatic as S;
+use Nebalus\Sanitizr\Schema\AbstractSanitizrSchema;
+use Nebalus\Sanitizr\Trait\SanitizrValueObjectTrait;
+
+final class Email
+{
+    use SanitizrValueObjectTrait;
+
+    private function __construct(private readonly string $value) {}
+
+    protected static function defineSchema(): AbstractSanitizrSchema
+    {
+        return S::string()->trim()->toLowerCase()->email();
+    }
+
+    public function asString(): string { return $this->value; }
+}
+
+$email = Email::from('  Alex@Example.com ');   // Email, holding "alex@example.com"
+Email::tryFrom('not an email');                 // null
+Email::isValid('alex@example.com');             // true
+
+$schema = S::object([
+    'contact' => Email::getValueObjectSchema(),
+    'cc' => S::array(Email::getValueObjectSchema())->optional()->default([]),
+]);
+$parsed = $schema->parse(['contact' => 'alex@example.com']);
+$parsed['contact'];                             // an Email, not a string
+```
+
+`Email::getSchema()` still yields the plain string. A class whose constructor takes the parsed value apart (an object schema, say) overrides the protected `fromParsed(mixed $value): static` hook.
+
 ### Advanced Usage
 
 - **Custom filters:**  
