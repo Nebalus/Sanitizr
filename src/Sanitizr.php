@@ -91,6 +91,20 @@ class Sanitizr
     }
 
     /**
+     * Creates a schema for validating email addresses.
+     *
+     * Shorthand for `string()->email()`.
+     *
+     * @param string|null $message Optional custom error message.
+     * @return SanitizrString The string schema instance that requires a valid email address.
+     */
+    public function email(?string $message = null): SanitizrString
+    {
+        $stringSchema = new SanitizrString();
+        return $stringSchema->email($message);
+    }
+
+    /**
      * Creates an array schema that validates arrays of the specified element schema.
      *
      * @param AbstractSanitizrSchema $schema The schema to apply to each array element.
