@@ -45,24 +45,13 @@ class SanitizrTuple extends AbstractSanitizrSchema
         foreach ($this->schemas as $schema) {
             $updatedPath = $path === '' ? "KEY" . $iterator : $path . ".KEY" . $iterator;
 
-            if ($schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false) {
-                $collectedErrors->addIssue(new SanitizrIssue(
-                    code: SanitizrIssue::MISSING_KEY,
-                    path: self::pathToArray($updatedPath),
-                    message: "Required",
-                    expected: 'defined',
-                    received: 'undefined',
-                ));
-                $iterator++;
-                continue;
-            }
+            $isMissing = $schema->isOptional() === false && isset($input[$iterator]) === false && $schema->isNullable() === false;
 
             try {
                 $currentValue = $input[$iterator] ?? null;
-                $result[] = $schema->parse(
-                    $currentValue,
-                    path: $updatedPath
-                );
+                $result[] = $isMissing
+                    ? self::parseMissingKey($schema, $updatedPath)
+                    : $schema->parse($currentValue, path: $updatedPath);
             } catch (SanitizrValidationException $e) {
                 $collectedErrors->merge($e->getError());
             }

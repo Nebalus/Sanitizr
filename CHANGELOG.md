@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+### Added
+- `catch(mixed $value)` on every schema: returns the given fallback instead of failing when the input does not satisfy the schema (after any `or()` fallbacks). A `Closure` is called with the `SanitizrError` and the original input to compute the fallback; any other value is returned as it is. Inside an object or tuple schema a missing key is caught as well, so `S::object(['role' => S::string()->catch('user')])` parses `[]` to `['role' => 'user']`.
+- `hasCatchValue()` on every schema.
 
 ## [2.2.1] - 2026-09-13
 ### Fixed
